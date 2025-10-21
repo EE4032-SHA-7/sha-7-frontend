@@ -4,6 +4,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 
 import './App.css';
+import GroupBuy from "./components/groupbuy/GroupBuy";
 import History from "./components/history/history";
 import Leader from "./components/leader/leader";
 import Login from "./components/login/login";
@@ -368,6 +369,7 @@ export default function App() {
                 <Route path="/InterfaceDemo/storage" element={<StorageDisplay />}></Route>
                 <Route path="/InterfaceDemo/history" element={<HistoryDisplay />}></Route>
                 <Route path="/InterfaceDemo/leader" element={<LeaderDisplay />}></Route>
+                <Route path="/InterfaceDemo/groupbuy" element={<GroupBuy />}></Route>
                 {/* Optional: A default route to redirect to login if no other route matches */}
                 <Route path="*" element={<Login isHaveMetamask={haveMetamask} connectTo={connectWallet} />} />
             </Routes>
