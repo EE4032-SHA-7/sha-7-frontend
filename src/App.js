@@ -106,7 +106,7 @@ export default function App() {
             setBalance(bal);
             setIsConnected(true);
 
-            navigate("/InterfaceDemo/profile");
+            navigate("/InterfaceDemo/groupbuy");
         } catch (error) {
             console.error("Error connecting wallet:", error);
             setIsConnected(false);
