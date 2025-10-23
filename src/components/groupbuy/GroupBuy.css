@@ -21,34 +21,34 @@
 /* Main card container */
 .groupbuy-card {
     display: flex;
+    align-items: stretch;           /* ensure both columns anchor to top */
     max-width: 800px;
     width: 100%;
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Important to keep rounded corners with the image */
+    overflow: hidden;               /* keep rounded corners with the image */
 }
 
-/* 2. Image container made into a perfect square */
+/* Image column (fixed height & width portion; no re-centering) */
 .groupbuy-image {
-    flex: 1; /* Takes up half the space of the card */
-    aspect-ratio: 1 / 1; /* This is the magic rule for a square */
+    flex: 0 0 50%;                  /* fixed 50% width column */
+    height: 420px;                  /* choose height that fits your design */
     background-color: #e9e9e9;
 }
-
 .groupbuy-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures the image fills the square without distortion */
+    object-fit: cover;              /* fill the fixed area cleanly */
 }
 
 /* Right side content */
 .groupbuy-content {
-    flex: 1; /* Takes up the other half of the space */
+    flex: 1;                        /* takes remaining width */
     padding: 30px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;    /* top-align so opening dropdown doesn't shift image */
 }
 
 .groupbuy-content h2 {
@@ -116,67 +116,65 @@
     text-align: center;
 }
 
-
-/* 3. New Styles for the Confirmation Modal */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+/* Declaration */
+.declaration {
+    margin-top: 18px;
+    font-size: 0.95rem;
+    color: #222;
+    line-height: 1.5;
+}
+.declaration label {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    text-align: center;
-    max-width: 400px;
-}
-
-.modal-text {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
-    color: #333;
-    line-height: 1.6;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-.modal-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    align-items: flex-start;
+    gap: 8px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
+}
+.declaration input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: #007bff;
 }
 
-.modal-button.confirm {
-    background-color: #dc3545; /* Red for warning */
-    color: white;
+/* Timeline (minimal dropdown) */
+.timeline {
+    margin-top: 24px;
 }
-.modal-button.confirm:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
+.timeline-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 8px 0;
+    font: inherit;
+    color: #111;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
-
-.modal-button.cancel {
-    background-color: #e9ecef;
+.timeline-toggle:hover {
+    color: #007bff;
+}
+.chevron {
+    font-size: 0.9rem;
+    color: #666;
+    transition: transform 0.2s ease;
+}
+.chevron.open {
+    transform: rotate(180deg);
+}
+.timeline-panel {
+    padding: 10px 0 0;
     color: #333;
+    font-size: 0.95rem;
 }
-.modal-button.cancel:hover {
-    background-color: #d3d9df;
-    transform: translateY(-2px);
+.timeline-panel p {
+    margin: 6px 0;
+}
+.timeline-panel strong {
+    font-weight: 600;
+    color: #111;
 }
