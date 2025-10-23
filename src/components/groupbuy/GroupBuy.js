@@ -2,33 +2,27 @@ import { useState } from 'react';
 import './GroupBuy.css';
 
 export default function GroupBuy() {
-    const [itemName, setItemName] = useState("SHA-7 Mechanical Keyboard");
+    const [itemName, setItemName] = useState("[GB] SHA-7 Mechanical Keyboard");
     const [price, setPrice] = useState(0.5); // price in ETC
     const [currentCommit, setCurrentCommit] = useState(3);
     const [totalRequired, setTotalRequired] = useState(10);
     const [hasCommitted, setHasCommitted] = useState(false);
-    
-    // New state to control the confirmation modal
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
 
-    // This function now just opens the modal
-    const handleCommitClick = () => {
-        setShowConfirmation(true);
-    };
+    const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+    const timelineId = "timeline-panel";
 
-    // This function contains the original commit logic and closes the modal
-    const confirmCommit = () => {
-        setHasCommitted(true);
-        setCurrentCommit(prev => Math.min(prev + 1, totalRequired));
-        setShowConfirmation(false); // Close the modal after confirming
-    };
-
-    // This function closes the modal without committing
-    const cancelCommit = () => {
-        setShowConfirmation(false);
-    };
-
+    const isGoalReached = currentCommit >= totalRequired;
     const progressPercent = Math.min((currentCommit / totalRequired) * 100, 100);
+
+    // Immediately commit (no modal)
+    const handleCommitClick = () => {
+    if (!isChecked || hasCommitted || isGoalReached) return;
+    setHasCommitted(true);
+    setCurrentCommit(prev => Math.min(prev + 1, totalRequired));
+    // Optional: lock the checkbox after commit
+    // setIsChecked(false);
+    };
 
     return (
         <div className="groupbuy-container">
@@ -55,34 +49,44 @@ export default function GroupBuy() {
                         <button 
                             className="commit-button" 
                             onClick={handleCommitClick} // Changed to open modal
-                            disabled={hasCommitted}
+                            disabled={!isChecked}
                         >
-                            {hasCommitted ? "You have committed ✅" : "Commit to Buy"}
+                            {hasCommitted ? "Order Successful!" : "ORDER NOW"}
                         </button>
                     )}
+                    <div className="declaration">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => setIsChecked(e.target.checked)}
+                                disabled={hasCommitted}
+                            />
+                            &nbsp;I agree to the SHA-7 group buy policy, and I acknowledge that I am committing to the production of this product.
+                        </label>
+                    </div>
+                    {/* Timeline dropdown */}
+                    <div className="timeline">
+                        <button
+                        className="timeline-toggle"
+                        onClick={() => setIsTimelineOpen(o => !o)}
+                        aria-expanded={isTimelineOpen}
+                        aria-controls={timelineId}
+                        >
+                        <strong>Timeline</strong>
+                        <span className={`chevron ${isTimelineOpen ? 'open' : ''}`} aria-hidden>▾</span>
+                        </button>
+
+                        {isTimelineOpen && (
+                        <div id={timelineId} className="timeline-panel">
+                            <p><strong>Group Buy Ends</strong> - November 26</p>
+                            <p><strong>Estimated Fulfillment Date</strong> - Q2 2026</p>
+                        </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* 2. Confirmation Pop-up (Modal) */}
-            {showConfirmation && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <p className="modal-text">
-                            This action is <strong>IRREVERSIBLE.</strong>
-                            <br />
-                            ARE YOU SURE you want to buy?
-                        </p>
-                        <div className="modal-actions">
-                            <button className="modal-button confirm" onClick={confirmCommit}>
-                                Yes, I'm Sure
-                            </button>
-                            <button className="modal-button cancel" onClick={cancelCommit}>
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
