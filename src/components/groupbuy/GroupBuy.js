@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Modal from '../modal/modal';
 import './GroupBuy.css';
 
 export default function GroupBuy() {
@@ -11,27 +12,33 @@ export default function GroupBuy() {
 
     const [isTimelineOpen, setIsTimelineOpen] = useState(false);
     const timelineId = "timeline-panel";
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isGoalReached = currentCommit >= totalRequired;
     const progressPercent = Math.min((currentCommit / totalRequired) * 100, 100);
 
-    // Immediately commit (no modal)
     const handleCommitClick = () => {
-    if (!isChecked || hasCommitted || isGoalReached) return;
-    setHasCommitted(true);
-    setCurrentCommit(prev => Math.min(prev + 1, totalRequired));
-    // Optional: lock the checkbox after commit
-    // setIsChecked(false);
+        if (!isChecked || hasCommitted || isGoalReached) return;
+        setHasCommitted(true);
+        setCurrentCommit(prev => Math.min(prev + 1, totalRequired));
+    };
+    
+    const openModal = (e) => {
+        e.preventDefault();
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
     };
 
     return (
         <div className="groupbuy-container">
-            {/* 1. Header Added */}
             <h1 className="main-header">SHA-7 Group Buy Demo</h1>
 
             <div className="groupbuy-card">
                 <div className="groupbuy-image">
-                    {/* The image will now display as a full square */}
                     <img src="/keyboard.png" alt="Item" />
                 </div>
                 <div className="groupbuy-content">
@@ -48,7 +55,7 @@ export default function GroupBuy() {
                     ) : (
                         <button 
                             className="commit-button" 
-                            onClick={handleCommitClick} // Changed to open modal
+                            onClick={handleCommitClick}
                             disabled={!isChecked}
                         >
                             {hasCommitted ? "Order Successful!" : "ORDER NOW"}
@@ -62,10 +69,11 @@ export default function GroupBuy() {
                                 onChange={(e) => setIsChecked(e.target.checked)}
                                 disabled={hasCommitted}
                             />
-                            &nbsp;I agree to the SHA-7 group buy policy, and I acknowledge that I am committing to the production of this product.
+                            <span>
+                                I agree to the <a href="#" onClick={openModal} className="policy-link">SHA-7 group buy policy</a>, and I acknowledge that I am committing to the production of this product.
+                            </span>
                         </label>
                     </div>
-                    {/* Timeline dropdown */}
                     <div className="timeline">
                         <button
                         className="timeline-toggle"
@@ -86,6 +94,24 @@ export default function GroupBuy() {
                     </div>
                 </div>
             </div>
+
+            {isModalOpen && (
+                <Modal onClose={closeModal}>
+                    <h2>Group Buy Policy</h2>
+                    <p>
+                        By committing to this group buy, you acknowledge and agree to the following terms:
+                    </p>
+                    <ul>
+                        <li>This is a pre-order for a product that is not yet in production.</li>
+                        <li>Once you have committed to the Group Buy, you are no longer allowed to withdraw from the purchase. Please consider carefully before making a confirmation.</li>
+                        <li>The estimated fulfillment date is an estimate and is subject to change due to production delays.</li>
+                        <li>You are responsible for any customs and import duties.</li>
+                    </ul>
+                    <p>
+                        Thank you for your understanding and participation!
+                    </p>
+                </Modal>
+            )}
 
         </div>
     );

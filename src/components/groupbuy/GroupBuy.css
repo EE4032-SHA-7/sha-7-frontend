@@ -1,4 +1,3 @@
-/* General container for the entire page */
 .groupbuy-container {
     display: flex;
     flex-direction: column;
@@ -10,7 +9,6 @@
     padding: 20px;
 }
 
-/* 1. Header Styling */
 .main-header {
     font-size: 2.5rem;
     color: #333;
@@ -18,37 +16,34 @@
     font-weight: 600;
 }
 
-/* Main card container */
 .groupbuy-card {
     display: flex;
-    align-items: stretch;           /* ensure both columns anchor to top */
+    align-items: stretch;
     max-width: 800px;
     width: 100%;
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden;               /* keep rounded corners with the image */
+    overflow: hidden;
 }
 
-/* Image column (fixed height & width portion; no re-centering) */
 .groupbuy-image {
-    flex: 0 0 50%;                  /* fixed 50% width column */
-    height: 420px;                  /* choose height that fits your design */
+    flex: 0 0 50%;
+    height: 420px;
     background-color: #e9e9e9;
 }
 .groupbuy-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;              /* fill the fixed area cleanly */
+    object-fit: cover;
 }
 
-/* Right side content */
 .groupbuy-content {
-    flex: 1;                        /* takes remaining width */
+    flex: 1;
     padding: 30px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;    /* top-align so opening dropdown doesn't shift image */
+    justify-content: flex-start;
 }
 
 .groupbuy-content h2 {
@@ -116,7 +111,6 @@
     text-align: center;
 }
 
-/* Declaration */
 .declaration {
     margin-top: 18px;
     font-size: 0.95rem;
@@ -136,7 +130,6 @@
     accent-color: #007bff;
 }
 
-/* Timeline (minimal dropdown) */
 .timeline {
     margin-top: 24px;
 }
@@ -178,3 +171,12 @@
     font-weight: 600;
     color: #111;
 }
+.policy-link {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+.policy-link:hover {
+    color: #0056b3;
+  }
