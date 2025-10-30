@@ -106,7 +106,7 @@ export default function App() {
             setBalance(bal);
             setIsConnected(true);
 
-            navigate("/InterfaceDemo/groupbuy");
+            navigate("/InterfaceDemo/profile");
         } catch (error) {
             console.error("Error connecting wallet:", error);
             setIsConnected(false);
@@ -370,7 +370,7 @@ export default function App() {
                 <Route path="/InterfaceDemo/history" element={<HistoryDisplay />}></Route>
                 <Route path="/InterfaceDemo/leader" element={<LeaderDisplay />}></Route>
                 <Route path="/InterfaceDemo/groupbuy" element={<GroupBuy />}></Route>
-                {/* Optional: A default route to redirect to login if no other route matches */}
+                {/* A default route to redirect to login if no other route matches */}
                 <Route path="*" element={<Login isHaveMetamask={haveMetamask} connectTo={connectWallet} />} />
             </Routes>
         </div>

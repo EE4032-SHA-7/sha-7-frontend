@@ -20,7 +20,7 @@ export const GlobalToolBar = () => {
             &nbsp;|&nbsp;
             <Link to = "/InterfaceDemo/history">History</Link>
             &nbsp;|&nbsp;
-            <Link to = "/InterfaceDemo/leader">Leader Election</Link>
+            <Link to = "/InterfaceDemo/groupbuy">Group Buy (Customer)</Link>
         </div>
     )
 }
