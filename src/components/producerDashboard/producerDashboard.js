@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Modal from '../modal/modal'; // Assuming the modal is in a shared location
 import './producerDashboard.css';
 
-// MOCK DATA: In a real application, this would come from a database or API.
+// MOCK DATA: Corrected image URLs for deployment
 const initialProducts = [
     {
         id: 1,
@@ -10,7 +10,7 @@ const initialProducts = [
         price: 0.5,
         currentCommits: 3,
         totalRequired: 10,
-        imageUrl: "/keyboard.png"
+        imageUrl: process.env.PUBLIC_URL + "/keyboard.png"
     },
     {
         id: 2,
@@ -18,7 +18,7 @@ const initialProducts = [
         price: 0.1,
         currentCommits: 25,
         totalRequired: 25,
-        imageUrl: "/phone_case.png"
+        imageUrl: process.env.PUBLIC_URL + "/phone_case.png"
     },
     {
         id: 3,
@@ -26,7 +26,7 @@ const initialProducts = [
         price: 0.05,
         currentCommits: 42,
         totalRequired: 100,
-        imageUrl: "/water_bottle.png"
+        imageUrl: process.env.PUBLIC_URL + "/water_bottle.png"
     }
 ];
 
@@ -45,17 +45,23 @@ export default function ProducerDashboard() {
 
     const handleAddProduct = (e) => {
         e.preventDefault();
+
+        // Correct the image URL when adding a new product
+        const finalImageUrl = newImageUrl
+            ? process.env.PUBLIC_URL + newImageUrl
+            : process.env.PUBLIC_URL + "/placeholder.png";
+
         const newProduct = {
             id: products.length + 1, // Simple ID generation
             name: newItemName,
             price: parseFloat(newItemPrice),
             currentCommits: 0,
             totalRequired: parseInt(newTotalRequired, 10),
-            imageUrl: newImageUrl || "/placeholder.png" // Default image
+            imageUrl: finalImageUrl
         };
-        
+
         setProducts(prevProducts => [...prevProducts, newProduct]);
-        
+
         // Reset form and close modal
         setNewItemName('');
         setNewItemPrice('');
@@ -79,19 +85,20 @@ export default function ProducerDashboard() {
                     return (
                         <div key={product.id} className="product-card-producer">
                             <div className="product-image-producer">
+                                {/* This will now work because the `imageUrl` in the state is correct */}
                                 <img src={product.imageUrl} alt={product.name} />
                             </div>
                             <div className="product-info-producer">
                                 <h3>{product.name}</h3>
                                 <p className="price">{product.price} ETC</p>
-                                
+
                                 <div className="status-tracker">
                                     <p>{product.currentCommits} / {product.totalRequired} committed</p>
                                     <div className="progress-bar">
                                         <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
                                     </div>
                                 </div>
-                                
+
                                 <p className={`status ${isGoalReached ? 'status-reached' : 'status-progress'}`}>
                                     {isGoalReached ? '✓ Goal Reached' : 'In Progress'}
                                 </p>
