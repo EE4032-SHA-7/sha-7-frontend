@@ -2,6 +2,7 @@
   "name": "sha-7-frontend",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ee4032-sha-7.github.io/sha-7-frontend",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
