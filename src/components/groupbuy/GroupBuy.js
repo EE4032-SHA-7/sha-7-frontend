@@ -39,7 +39,8 @@ export default function GroupBuy() {
 
             <div className="groupbuy-card">
                 <div className="groupbuy-image">
-                    <img src="/keyboard.png" alt="Item" />
+                    {/* THIS IS THE CORRECTED LINE */}
+                    <img src={process.env.PUBLIC_URL + '/keyboard.png'} alt="Item" />
                 </div>
                 <div className="groupbuy-content">
                     <h2>{itemName}</h2>
