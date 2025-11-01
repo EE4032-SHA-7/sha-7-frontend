@@ -8,6 +8,7 @@ import GroupBuy from "./components/groupbuy/GroupBuy";
 import History from "./components/history/history";
 import Leader from "./components/leader/leader";
 import Login from "./components/login/login";
+import ProducerDashboard from './components/producerDashboard/producerDashboard';
 import Profile from "./components/profile/profile";
 import Storage from "./components/storage/storage";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./contracts/config";
@@ -370,6 +371,7 @@ export default function App() {
                 <Route path="/InterfaceDemo/history" element={<HistoryDisplay />}></Route>
                 <Route path="/InterfaceDemo/leader" element={<LeaderDisplay />}></Route>
                 <Route path="/InterfaceDemo/groupbuy" element={<GroupBuy />}></Route>
+                <Route path="/InterfaceDemo/producer-dashboard" element={<ProducerDashboard />}></Route>
                 {/* A default route to redirect to login if no other route matches */}
                 <Route path="*" element={<Login isHaveMetamask={haveMetamask} connectTo={connectWallet} />} />
             </Routes>
