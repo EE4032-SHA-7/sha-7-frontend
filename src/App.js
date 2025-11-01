@@ -24,14 +24,12 @@ export default function App() {
     const [isConnected, setIsConnected] = useState(false);
 
     // State for Web3 provider and contracts (initialized after connection)
-    const [provider, setProvider] = useState(null);
     const [contract, setContract] = useState(null);
     const [contract2, setContract2] = useState(null);
 
     // State for Storage contract
     const [storedPending, setStoredPending] = useState(false);
     const [storedDone, setStoredDone] = useState(false);
-    const [storedVal, setStoredVal] = useState(0);
     const [showVal, setShowVal] = useState(0);
 
     // State for History
@@ -73,7 +71,6 @@ export default function App() {
 
             // **FIX**: Initialize provider and contracts here, after confirming ethereum exists.
             const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-            setProvider(web3Provider);
 
             const web3Instance = new Web3(window.ethereum);
             const contractInstance = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
@@ -287,7 +284,6 @@ export default function App() {
             RecordPush('store', inputVal, 'null');
         } else {
             setStoredPending(true);
-            setStoredVal(inputVal);
 
             try {
                 const detail = await storeData(inputVal);

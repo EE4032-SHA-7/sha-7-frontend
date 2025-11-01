@@ -27,6 +27,27 @@
     pointer-events: none;
 }
 
+.global-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #007bff; /* A standard link color, change if needed */
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit; /* Make sure it uses the parent's font */
+    text-align: inherit; /* Align with surrounding text */
+}
+
+.policy-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #007bff; /* Or whatever your link color is */
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit; /* Inherit font styles from the parent */
+}
+
 @media (prefers-reduced-motion: no-preference) {
     .login-logo {
       animation: login-logo-spin infinite 20s linear;
