@@ -3,16 +3,16 @@ import Modal from '../modal/modal';
 import './GroupBuy.css';
 
 export default function GroupBuy() {
-    const [itemName, setItemName] = useState("[GB] SHA-7 Mechanical Keyboard");
-    const [price, setPrice] = useState(0.5); // price in ETC
+    const itemName = "[GB] SHA-7 Mechanical Keyboard";
+    const price = 0.5; // price in ETC
     const [currentCommit, setCurrentCommit] = useState(3);
-    const [totalRequired, setTotalRequired] = useState(10);
+    const totalRequired = 10;
     const [hasCommitted, setHasCommitted] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
 
     const [isTimelineOpen, setIsTimelineOpen] = useState(false);
     const timelineId = "timeline-panel";
-    
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isGoalReached = currentCommit >= totalRequired;
@@ -23,7 +23,7 @@ export default function GroupBuy() {
         setHasCommitted(true);
         setCurrentCommit(prev => Math.min(prev + 1, totalRequired));
     };
-    
+
     const openModal = (e) => {
         e.preventDefault();
         setIsModalOpen(true);
@@ -45,7 +45,7 @@ export default function GroupBuy() {
                     <h2>{itemName}</h2>
                     <p className="price">{price} ETC</p>
                     <p className="commit-status">{currentCommit} / {totalRequired} committed</p>
-                    
+
                     <div className="progress-bar">
                         <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
                     </div>
@@ -53,8 +53,8 @@ export default function GroupBuy() {
                     {currentCommit >= totalRequired ? (
                         <p className="goal-reached">🎉 Group buy goal reached!</p>
                     ) : (
-                        <button 
-                            className="commit-button" 
+                        <button
+                            className="commit-button"
                             onClick={handleCommitClick}
                             disabled={!isChecked}
                         >
@@ -70,26 +70,26 @@ export default function GroupBuy() {
                                 disabled={hasCommitted}
                             />
                             <span>
-                                I agree to the <a href="#" onClick={openModal} className="policy-link">SHA-7 group buy policy</a>, and I acknowledge that I am committing to the production of this product.
+                                I agree to the <button onClick={openModal} className="policy-link">SHA-7 group buy policy</button>, and I acknowledge that I am committing to the production of this product.
                             </span>
                         </label>
                     </div>
                     <div className="timeline">
                         <button
-                        className="timeline-toggle"
-                        onClick={() => setIsTimelineOpen(o => !o)}
-                        aria-expanded={isTimelineOpen}
-                        aria-controls={timelineId}
+                            className="timeline-toggle"
+                            onClick={() => setIsTimelineOpen(o => !o)}
+                            aria-expanded={isTimelineOpen}
+                            aria-controls={timelineId}
                         >
-                        <strong>Timeline</strong>
-                        <span className={`chevron ${isTimelineOpen ? 'open' : ''}`} aria-hidden>▾</span>
+                            <strong>Timeline</strong>
+                            <span className={`chevron ${isTimelineOpen ? 'open' : ''}`} aria-hidden>▾</span>
                         </button>
 
                         {isTimelineOpen && (
-                        <div id={timelineId} className="timeline-panel">
-                            <p><strong>Group Buy Ends</strong> - November 26</p>
-                            <p><strong>Estimated Fulfillment Date</strong> - Q2 2026</p>
-                        </div>
+                            <div id={timelineId} className="timeline-panel">
+                                <p><strong>Group Buy Ends</strong> - November 26</p>
+                                <p><strong>Estimated Fulfillment Date</strong> - Q2 2026</p>
+                            </div>
                         )}
                     </div>
                 </div>
