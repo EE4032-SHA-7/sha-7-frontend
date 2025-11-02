@@ -20,7 +20,7 @@ export const GlobalToolBar = () => {
             &nbsp;|&nbsp;
             <Link to = "/InterfaceDemo/history">History</Link>
             &nbsp;|&nbsp;
-            <Link to = "/InterfaceDemo/groupbuy">Group Buy (Customer)</Link>
+            <Link to = "/InterfaceDemo/groupbuy-landing">Group Buy (Customer)</Link>
             &nbsp;|&nbsp;
             <Link to = "/InterfaceDemo/producer-dashboard">Group Buy (Producer)</Link>
         </div>

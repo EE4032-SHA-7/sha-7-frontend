@@ -1,0 +1,121 @@
+.groupbuy-landing-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+}
+
+.landing-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.landing-header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+}
+
+.landing-header p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.product-grid-landing {
+    display: grid;
+    /* Creates a responsive grid that shows as many 300px columns as will fit */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.product-card-landing {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* For the clickable keyboard link */
+.product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-link:hover .product-card-landing {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for non-clickable dummy items */
+.product-card-landing.disabled {
+    cursor: not-allowed;
+    filter: grayscale(50%);
+    opacity: 0.8;
+}
+
+.product-image-landing img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-info-landing {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* This makes the card content fill the available space */
+}
+
+.product-info-landing h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+}
+
+.price-landing {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.status-tracker-landing {
+    margin-bottom: 1rem;
+}
+
+.status-tracker-landing p {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.progress-bar-landing {
+    background-color: #e9ecef;
+    border-radius: 5px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-fill-landing {
+    background-color: #28a745;
+    height: 100%;
+}
+
+.status-landing {
+    margin-top: auto; /* Pushes the status text to the bottom of the card */
+    font-weight: bold;
+    text-align: right;
+    font-size: 0.95rem;
+}
+
+.status-progress {
+    color: #ff9800; /* Orange for in-progress */
+}
+
+.status-reached {
+    color: #28a745; /* Green for goal reached */
+}
