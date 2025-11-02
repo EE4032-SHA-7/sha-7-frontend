@@ -7,12 +7,15 @@ export default function GroupBuy() {
     const price = 0.5; // price in ETC
     const [currentCommit, setCurrentCommit] = useState(3);
     const totalRequired = 10;
+
+    // ADDITION: A state to hold the item's current status.
+    const [status, setStatus] = useState('Open');
+
+    // --- Original state from your file ---
     const [hasCommitted, setHasCommitted] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-
     const [isTimelineOpen, setIsTimelineOpen] = useState(false);
     const timelineId = "timeline-panel";
-
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isGoalReached = currentCommit >= totalRequired;
@@ -22,6 +25,9 @@ export default function GroupBuy() {
         if (!isChecked || hasCommitted || isGoalReached) return;
         setHasCommitted(true);
         setCurrentCommit(prev => Math.min(prev + 1, totalRequired));
+
+        // --- FINAL CHANGE: Update the status on successful commit ---
+        setStatus('Committed');
     };
 
     const openModal = (e) => {
@@ -33,13 +39,23 @@ export default function GroupBuy() {
         setIsModalOpen(false);
     };
 
+    // ADDITION: Helper function to create a CSS class from the status string.
+    const getStatusClass = (status) => {
+        return status.toLowerCase().replace(' ', '-');
+    };
+
     return (
         <div className="groupbuy-container">
             <h1 className="main-header">SHA-7 Group Buy Demo</h1>
 
             <div className="groupbuy-card">
                 <div className="groupbuy-image">
-                    {/* THIS IS THE CORRECTED LINE */}
+
+                    {/* --- ADDITION: The Status Badge --- */}
+                    <div className={`status-badge-detail ${getStatusClass(status)}`}>
+                        {status}
+                    </div>
+
                     <img src={process.env.PUBLIC_URL + '/keyboard.png'} alt="Item" />
                 </div>
                 <div className="groupbuy-content">
@@ -51,13 +67,14 @@ export default function GroupBuy() {
                         <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
                     </div>
 
+                    {/* --- This section is identical to your original code --- */}
                     {currentCommit >= totalRequired ? (
                         <p className="goal-reached">🎉 Group buy goal reached!</p>
                     ) : (
                         <button
                             className="commit-button"
                             onClick={handleCommitClick}
-                            disabled={!isChecked}
+                            disabled={!isChecked || hasCommitted}
                         >
                             {hasCommitted ? "Order Successful!" : "ORDER NOW"}
                         </button>

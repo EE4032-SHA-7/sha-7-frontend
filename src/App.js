@@ -4,7 +4,6 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 
 import './App.css';
-import GroupBuy from "./components/groupbuy/GroupBuy";
 import History from "./components/history/history";
 import Leader from "./components/leader/leader";
 import Login from "./components/login/login";
@@ -13,6 +12,8 @@ import Profile from "./components/profile/profile";
 import Storage from "./components/storage/storage";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./contracts/config";
 import { CONTRACT_ABI_2, CONTRACT_ADDRESS_2 } from "./contracts/config_2";
+import GroupBuyLanding from "./components/groupbuy-landing/groupbuyLanding";
+import GroupBuy from "./components/groupbuy/GroupBuy";
 
 
 export default function App() {
@@ -366,6 +367,7 @@ export default function App() {
                 <Route path="/InterfaceDemo/storage" element={<StorageDisplay />}></Route>
                 <Route path="/InterfaceDemo/history" element={<HistoryDisplay />}></Route>
                 <Route path="/InterfaceDemo/leader" element={<LeaderDisplay />}></Route>
+                <Route path="/InterfaceDemo/groupbuy-landing" element={<GroupBuyLanding />}></Route>
                 <Route path="/InterfaceDemo/groupbuy" element={<GroupBuy />}></Route>
                 <Route path="/InterfaceDemo/producer-dashboard" element={<ProducerDashboard />}></Route>
                 {/* A default route to redirect to login if no other route matches */}

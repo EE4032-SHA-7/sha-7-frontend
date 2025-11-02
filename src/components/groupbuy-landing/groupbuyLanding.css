@@ -1,0 +1,144 @@
+.groupbuy-landing-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+}
+
+.landing-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.landing-header h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+}
+
+.landing-header p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.product-grid-landing {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.product-card-landing {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative; /* Needed for the status badge positioning */
+}
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-link:hover .product-card-landing {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.product-card-landing.disabled {
+    cursor: not-allowed;
+    filter: grayscale(20%);
+    opacity: 0.9;
+}
+
+/* --- NEW STATUS BADGE STYLES --- */
+.status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Color coding for each status */
+.status-badge.open { background-color: #007bff; } /* Blue */
+.status-badge.committed { background-color: #28a745; } /* Green */
+.status-badge.closed { background-color: #6c757d; } /* Gray */
+.status-badge.order-confirmed { background-color: #6f42c1; } /* Purple */
+.status-badge.order-completed { background-color: #17a2b8; } /* Teal/Cyan */
+/* --- END OF NEW STYLES --- */
+
+
+.product-image-landing img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-info-landing {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-info-landing h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    padding-right: 70px; /* Add padding to prevent text from overlapping with the badge */
+}
+
+.price-landing {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.status-tracker-landing {
+    margin-bottom: 1rem;
+}
+
+.status-tracker-landing p {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.progress-bar-landing {
+    background-color: #e9ecef;
+    border-radius: 5px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-fill-landing {
+    background-color: #28a745;
+    height: 100%;
+}
+
+.goal-status-landing { /* Renamed to avoid confusion with the new status badge */
+    margin-top: auto;
+    font-weight: bold;
+    text-align: right;
+    font-size: 0.95rem;
+}
+
+.status-progress {
+    color: #ff9800;
+}
+
+.status-reached {
+    color: #28a745;
+}
