@@ -23,7 +23,6 @@
 
 .product-grid-landing {
     display: grid;
-    /* Creates a responsive grid that shows as many 300px columns as will fit */
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
 }
@@ -37,9 +36,9 @@
     flex-direction: column;
     height: 100%;
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative; /* Needed for the status badge positioning */
 }
 
-/* For the clickable keyboard link */
 .product-link {
     text-decoration: none;
     color: inherit;
@@ -50,12 +49,35 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Styles for non-clickable dummy items */
 .product-card-landing.disabled {
     cursor: not-allowed;
-    filter: grayscale(50%);
-    opacity: 0.8;
+    filter: grayscale(20%);
+    opacity: 0.9;
 }
+
+/* --- NEW STATUS BADGE STYLES --- */
+.status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Color coding for each status */
+.status-badge.open { background-color: #007bff; } /* Blue */
+.status-badge.committed { background-color: #28a745; } /* Green */
+.status-badge.closed { background-color: #6c757d; } /* Gray */
+.status-badge.order-confirmed { background-color: #6f42c1; } /* Purple */
+.status-badge.order-completed { background-color: #17a2b8; } /* Teal/Cyan */
+/* --- END OF NEW STYLES --- */
+
 
 .product-image-landing img {
     width: 100%;
@@ -68,12 +90,13 @@
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* This makes the card content fill the available space */
+    flex-grow: 1;
 }
 
 .product-info-landing h3 {
     margin: 0 0 0.5rem;
     font-size: 1.25rem;
+    padding-right: 70px; /* Add padding to prevent text from overlapping with the badge */
 }
 
 .price-landing {
@@ -105,17 +128,17 @@
     height: 100%;
 }
 
-.status-landing {
-    margin-top: auto; /* Pushes the status text to the bottom of the card */
+.goal-status-landing { /* Renamed to avoid confusion with the new status badge */
+    margin-top: auto;
     font-weight: bold;
     text-align: right;
     font-size: 0.95rem;
 }
 
 .status-progress {
-    color: #ff9800; /* Orange for in-progress */
+    color: #ff9800;
 }
 
 .status-reached {
-    color: #28a745; /* Green for goal reached */
+    color: #28a745;
 }

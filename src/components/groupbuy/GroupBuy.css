@@ -180,3 +180,34 @@
 .policy-link:hover {
     color: #0056b3;
   }
+
+/* --- ADD THESE STYLES TO YOUR CSS FILE --- */
+
+/* This allows the badge to be positioned relative to the image container */
+.groupbuy-image {
+    position: relative;
+}
+
+/* Styles for the status badge itself */
+.status-badge-detail {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10; /* Ensures the badge is on top of the image */
+
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    letter-spacing: 0.5px;
+}
+
+/* Color coding for each status */
+.status-badge-detail.open { background-color: #007bff; }
+.status-badge-detail.committed { background-color: #28a745; }
+.status-badge-detail.closed { background-color: #6c757d; }
+.status-badge-detail.order-confirmed { background-color: #6f42c1; }
+.status-badge-detail.order-completed { background-color: #17a2b8; }
