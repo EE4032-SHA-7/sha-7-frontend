@@ -1,107 +1,90 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './groupbuyLanding.css';
+import { useState, useEffect, useCallback } from 'react';
+import { Link } from "react-router-dom";
+import { ethers } from 'ethers';
+import Web3 from 'web3';
+import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../../contracts/config";
+import "./groupbuyLanding.css";
+import "../../global.css";
+import { GlobalToolBar } from "../../global";
 
-// MOCK DATA: Now includes a 'status' for each item.
-const availableGroupBuys = [
-    {
-        id: 1,
-        name: "[GB] SHA-7 Mechanical Keyboard",
-        price: 0.5,
-        currentCommits: 3,
-        totalRequired: 10,
-        imageUrl: process.env.PUBLIC_URL + "/keyboard.png",
-        isClickable: true,
-        path: "/InterfaceDemo/groupbuy",
-        status: "Open" // User can still join this.
-    },
-    {
-        id: 2,
-        name: "Phone Case",
-        price: 0.1,
-        currentCommits: 25,
-        totalRequired: 25,
-        imageUrl: process.env.PUBLIC_URL + "/phone_case.png",
-        isClickable: true,
-        status: "Committed" // User has already joined this one.
-    },
-    {
-        id: 3,
-        name: "Water Bottle",
-        price: 0.05,
-        currentCommits: 100,
-        totalRequired: 100,
-        imageUrl: process.env.PUBLIC_URL + "/water_bottle.png",
-        isClickable: true,
-        status: "Order Confirmed" // Goal reached, now in production.
-    },
-];
-
-/**
- * A reusable card component to display product information, now with a status badge.
- */
-const ProductCard = ({ product }) => {
-    const progressPercent = (product.currentCommits / product.totalRequired) * 100;
-    const isGoalReached = product.currentCommits >= product.totalRequired;
-
-    // Helper function to get the right CSS class for each status
-    const getStatusClass = (status) => {
-        return status.toLowerCase().replace(' ', '-'); // e.g., "Order Confirmed" -> "order-confirmed"
-    };
-
+const ProductCard = ({ campaign }) => {
+    let status = 'Open';
+    if (campaign.successful) status = 'Successful';
+    else if (Date.now() / 1000 > campaign.deadline && campaign.deadline !== "0") status = 'Failed';
+    const progressPercent = campaign.goal > 0 ? (parseInt(campaign.committed) / parseInt(campaign.goal)) * 100 : 0;
     return (
-        <div className={`product-card-landing ${!product.isClickable ? 'disabled' : ''}`}>
-            {/* Status Badge */}
-            <div className={`status-badge ${getStatusClass(product.status)}`}>
-                {product.status}
-            </div>
-
-            <div className="product-image-landing">
-                <img src={product.imageUrl} alt={product.name} />
-            </div>
+        <div className="product-card-landing">
+            <div className={`status-badge ${status.toLowerCase()}`}>{status}</div>
+            <div className="product-image-landing"><img src={`${process.env.PUBLIC_URL}/keyboard.png`} alt={`Campaign ${campaign.id}`} /></div>
             <div className="product-info-landing">
-                <h3>{product.name}</h3>
-                <p className="price-landing">{product.price} ETC</p>
-
+                <h3>{`[GB] Campaign #${campaign.id}`}</h3>
+                <p className="price-landing">{ethers.utils.formatEther(campaign.unitPrice)} ETH</p>
                 <div className="status-tracker-landing">
-                    <p>{product.currentCommits} / {product.totalRequired} committed</p>
-                    <div className="progress-bar-landing">
-                        <div className="progress-fill-landing" style={{ width: `${progressPercent}%` }}></div>
-                    </div>
+                    <p>{`${campaign.committed} / ${campaign.goal}`} committed</p>
+                    <div className="progress-bar-landing"><div className="progress-fill-landing" style={{ width: `${progressPercent}%` }}></div></div>
                 </div>
-
-                <p className={`goal-status-landing ${isGoalReached ? 'status-reached' : 'status-progress'}`}>
-                    {isGoalReached ? '✓ Goal Reached' : 'In Progress'}
-                </p>
             </div>
         </div>
     );
 };
 
-/**
- * The main landing page component that displays a grid of products.
- */
 export default function GroupBuyLanding() {
+    const [campaigns, setCampaigns] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const fetchCampaigns = async () => {
+            if (!window.ethereum) {
+                setError("MetaMask is not installed.");
+                setIsLoading(false);
+                return;
+            }
+            setIsLoading(true);
+            try {
+                const web3Instance = new Web3(window.ethereum);
+                const contract = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+
+                // Since the contract has no campaign counter, we check the first 10 IDs.
+                const campaignPromises = [];
+                for (let i = 0; i < 10; i++) {
+                    campaignPromises.push(contract.methods.campaigns(i).call());
+                }
+                const results = await Promise.all(campaignPromises);
+                const activeCampaigns = results
+                    .map((c, index) => ({ ...c, id: index }))
+                    .filter(c => c.organizer !== '0x0000000000000000000000000000000000000000');
+
+                setCampaigns(activeCampaigns);
+            } catch (err) {
+                console.error("Failed to fetch campaigns:", err);
+                setError("Could not fetch campaign list. Is your wallet connected to the Sepolia network?");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCampaigns();
+    }, []); // Runs once on component load
+
     return (
         <div className="groupbuy-landing-page">
-            <header className="landing-header">
-                <h1>Active Group Buys</h1>
-                <p>Join others to bring these products to life. Click on an item to participate!</p>
-            </header>
-
-            <div className="product-grid-landing">
-                {availableGroupBuys.map(product => (
-                    product.isClickable ? (
-                        <Link to={product.path} key={product.id} className="product-link">
-                            <ProductCard product={product} />
-                        </Link>
+            <h1>Active Group Buys</h1>
+            {isLoading && <p>Loading active campaigns...</p>}
+            {error && <p className="error-message-box">{error}</p>}
+            {!isLoading && !error && (
+                <div className="product-grid-landing">
+                    {campaigns.length > 0 ? (
+                        campaigns.map(c => (
+                            <Link key={c.id} to={`/InterfaceDemo/groupbuy/${c.id}`}>
+                                <ProductCard campaign={c} />
+                            </Link>
+                        ))
                     ) : (
-                        <div key={product.id}> {/* Wrap non-link in a div for a consistent structure */}
-                            <ProductCard product={product} />
-                        </div>
-                    )
-                ))}
-            </div>
+                        <p>No active group buys found.</p>
+                    )}
+                </div>
+            )}
+            <GlobalToolBar/>
         </div>
     );
 }
