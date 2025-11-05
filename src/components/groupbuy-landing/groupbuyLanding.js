@@ -42,7 +42,7 @@ const ProductCard = ({ campaign }) => {
 export default function GroupBuyLanding(props) {
     const [campaigns, setCampaigns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isCreating, setIsCreating] = useState(false);
+    const isCreating = false;
     const [error, setError] = useState("");
 
     const fetchCampaigns = useCallback(async () => {

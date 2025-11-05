@@ -20,8 +20,8 @@ export default function GroupBuy() {
     const [userHasRefunded, setUserHasRefunded] = useState(false);
     const [status, setStatus] = useState("Connect Wallet");
     const [isLoading, setIsLoading] = useState(true);
-    const [isCommitting, setIsCommitting] = useState(false);
-    const [isRefunding, setIsRefunding] = useState(false);
+    const isCommitting =false;
+    const isRefunding =false;
     const [isChecked, setIsChecked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isTimelineOpen, setIsTimelineOpen] = useState(false); // State for the timeline toggle

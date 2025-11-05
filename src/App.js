@@ -26,21 +26,20 @@ export default function App() {
     const [isConnected, setIsConnected] = useState(false);
     const [contract, setContract] = useState(null);
     const [contract2, setContract2] = useState(null);
-    const [storedPending, setStoredPending] = useState(false);
-    const [storedDone, setStoredDone] = useState(false);
-    const [showVal, setShowVal] = useState(0);
-    const [historyRecord, setHistoryRecord] = useState([]);
-    const [recordLen, setRecordLen] = useState(0);
-    const maxRecordLen = 50;
-    const [commitPending, setCommitPending] = useState(false);
-    const [commitDone, setCommitDone] = useState(false);
-    const [revealPending, setRevealPending] = useState(false);
-    const [revealAccepted, setRevealAccepted] = useState(false);
-    const [resetDone, setResetDone] = useState(false);
-    const [showLead, setShowLead] = useState("0x0000000000000000000000000000000000000000");
-    const [electionOn, setElectionOn] = useState(false);
-    const [revealOn, setRevealOn] = useState(false);
-    const [elected, setElected] = useState(false);
+    const storedPending = false;
+    const storedDone = false;
+    const showVal = 0;
+    const historyRecord = [];
+    const recordLen = 0;
+    const commitPending = false;
+    const commitDone = false;
+    const revealPending = false;
+    const revealAccepted = false;
+    const resetDone = false;
+    const showLead = "0x0000000000000000000000000000000000000000";
+    const electionOn = false;
+    const revealOn = false;
+    const elected = false;
     const navigate = useNavigate();
 
     // --- NEW (NECESSARY): State for all Group Buy components ---
@@ -86,15 +85,10 @@ export default function App() {
         }
     }
     // ... (All your other original functions remain here, unabridged)
-    const storeData = async (inputVal) => { /*...*/ };
-    const getData = async () => { /*...*/ };
-    const RecordOverFlow = () => { /*...*/ };
-    const RecordPush = (opr, val, detail) => { /*...*/ };
     const commitValUpdate = async () => { /*...*/ };
     const revealVal = async () => { /*...*/ };
     const resetHandle = async () => { /*...*/ };
     useEffect(() => { /*...*/ }, [contract2]);
-    const getLeader = async () => { /*...*/ };
     const storedValUpdate = async () => { /*...*/ };
     const showValUpdate = async () => { /*...*/ };
     const showLeaderUpdate = async () => { /*...*/ };
