@@ -142,3 +142,10 @@
 .status-reached {
     color: #28a745;
 }
+
+/* --- ADD THIS LINE TO YOUR CSS FILE, with the other status badges --- */
+
+.status-badge.open { background-color: #007bff; }
+.status-badge.successful { background-color: #28a745; }
+.status-badge.committed { background-color: #28a745; } /* <-- ADD THIS LINE */
+.status-badge.failed { background-color: #6c757d; }

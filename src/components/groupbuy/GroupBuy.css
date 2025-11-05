@@ -205,6 +205,53 @@
     letter-spacing: 0.5px;
 }
 
+/* --- ADD THIS TO THE BOTTOM OF YOUR GroupBuy.css FILE --- */
+
+.status-message-box {
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: 2px solid;
+}
+
+.status-message-box.committed {
+    background-color: #eaf6ec;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.status-message-box.order-confirmed {
+    background-color: #e8f4fd;
+    border-color: #007bff;
+    color: #004085;
+}
+
+.status-message-box.cancelled {
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+    color: #343a40;
+}
+
+.refund-section {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+/* Style for the refund button */
+.commit-button.cancel {
+    background-color: #dc3545; /* Red color for cancel/refund */
+    border-color: #dc3545;
+}
+
+.commit-button.cancel:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
 /* Color coding for each status */
 .status-badge-detail.open { background-color: #007bff; }
 .status-badge-detail.committed { background-color: #28a745; }
