@@ -9,19 +9,36 @@ import "../../global.css";
 import Modal from '../modal/modal';
 import './GroupBuy.css';
 
-export default function GroupBuy() {
-    const { id } = useParams();
+// --- NEW: A mapping to define the look of each campaign ID (copied from groupbuyLanding.js) ---
+const CAMPAIGN_METADATA = {
+    0: {
+        name: "[GB] SHA-7 Mechanical Keyboard",
+        image: "/keyboard.png"
+    },
+    1: {
+        name: "[GB] Hydro Flask Water Bottle",
+        image: "/water_bottle.png" 
+    },
+    2: {
+        name: "[GB] Custom Phone Case",
+        image: "/phone_case.png"
+    },
+    // Ensure this metadata is consistent with your GroupBuyLanding.js
+};
 
-    // --- State Management (Unchanged) ---
+export default function GroupBuy() {
+    const { id } = useParams(); // Campaign ID from URL
+
+    // --- State Management ---
     const [address, setAddress] = useState(null);
     const [contract, setContract] = useState(null);
     const [campaignData, setCampaignData] = useState(null);
     const [userHasCommitted, setUserHasCommitted] = useState(false);
     const [userHasRefunded, setUserHasRefunded] = useState(false);
-    const [status, setStatus] = useState("Connecting..."); // Initial status is now "Connecting..."
-    const [isLoading, setIsLoading] = useState(true); // Start in a loading state
+    const [status, setStatus] = useState("Connecting...");
+    const [isLoading, setIsLoading] = useState(true);
     const [isCommitting, setIsCommitting] = useState(false);
-    const isRefunding = false;
+    const [isRefunding, setIsRefunding] = useState(false); // Corrected to useState
     const [isChecked, setIsChecked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isTimelineOpen, setIsTimelineOpen] = useState(false);
@@ -33,35 +50,50 @@ export default function GroupBuy() {
         setErrorMessage("");
         try {
             const progress = await contractInstance.methods.getProgress(id).call();
+            // Check if campaign exists
             if (progress.organizer === '0x0000000000000000000000000000000000000000') {
-                setStatus("Not Found"); setCampaignData(null); return;
+                setStatus("Not Found"); 
+                setCampaignData(null); 
+                return;
             }
+            
             const hasCommitted = await contractInstance.methods.hasCommitted(id, userAddress).call();
             const hasRefunded = await contractInstance.methods.hasRefunded(id, userAddress).call();
             const fullCampaign = await contractInstance.methods.campaigns(id).call();
-            const data = { committed: parseInt(progress.committed), goal: parseInt(progress.goal), successful: progress.successful, deadline: parseInt(progress.deadline), unitPrice: fullCampaign.unitPrice };
+            
+            const data = { 
+                committed: parseInt(progress.committed),
+                goal: parseInt(progress.goal),
+                successful: progress.successful,
+                deadline: parseInt(progress.deadline),
+                unitPrice: fullCampaign.unitPrice
+            };
             setCampaignData(data);
-
-            // --- FIX #2: As requested, this is set to false for testing ---
-            // setUserHasCommitted(false); 
             setUserHasCommitted(hasCommitted);
-
             setUserHasRefunded(hasRefunded);
+
+            // Determine campaign status
             if (data.successful) setStatus('Order Confirmed');
             else if (Date.now() / 1000 > data.deadline && data.deadline !== 0) setStatus('Cancelled');
             else setStatus('Open');
+
         } catch (error) {
-            console.error("CRITICAL ERROR while fetching data:", error);
+            console.error("CRITICAL ERROR while fetching data for campaign:", id, error);
             setStatus("Error");
             setErrorMessage("Could not read from contract. Check config.js and network.");
         } finally {
             setIsLoading(false);
         }
-    }, [id]);
+    }, [id]); // id is a dependency because we're fetching data specific to this campaign
 
     // --- Wallet Connection ---
     const connectAndInitialize = useCallback(async () => {
-        if (!window.ethereum) { alert("Please install MetaMask!"); return; }
+        if (!window.ethereum) { 
+            alert("Please install MetaMask!"); 
+            setErrorMessage("MetaMask is not installed.");
+            setIsLoading(false); // Stop loading if no MetaMask
+            return; 
+        }
         setErrorMessage("");
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -72,29 +104,34 @@ export default function GroupBuy() {
             setAddress(userAddress);
             setContract(contractInstance);
 
-            // After connecting, immediately fetch the data.
             await fetchCampaignData(contractInstance, userAddress);
 
         } catch (error) {
             console.error("Error connecting wallet:", error);
             setErrorMessage(error.message);
+            setIsLoading(false); // Stop loading on connection error
         }
-    }, [fetchCampaignData]); // fetchCampaignData is a stable dependency
+    }, [fetchCampaignData]);
 
-    // --- FIX #1: This useEffect runs ONCE on component load to connect automatically ---
     useEffect(() => {
         connectAndInitialize();
-    }, [connectAndInitialize]); // This dependency is stable and won't cause loops
+    }, [connectAndInitialize]);
 
-    // --- Transaction Handlers (Correct and Unchanged) ---
+    // --- Transaction Handlers ---
     const handleCommitClick = async () => {
-        if (!contract || !address || !isChecked || userHasCommitted || status !== 'Open' || !campaignData) return;
+        if (!contract || !address || !isChecked || userHasCommitted || status !== 'Open' || !campaignData) {
+            setErrorMessage("Cannot commit: check conditions (policy, committed status, campaign open).");
+            return;
+        }
         setErrorMessage("");
         setIsCommitting(true);
         try {
+            // Your contract's commit function signature might vary. Adjust parameters as needed.
+            // Assuming 0x0...0 for organizer, 0 for price/goal/duration if just joining.
             await contract.methods.commit(id, '0x0000000000000000000000000000000000000000', 0, 0, 0)
                 .send({ from: address, value: campaignData.unitPrice });
             await fetchCampaignData(contract, address);
+            setIsChecked(false); // Reset checkbox after successful commit
         } catch (error) {
             console.error("Commit transaction failed:", error);
             setErrorMessage(error.message);
@@ -103,9 +140,25 @@ export default function GroupBuy() {
         }
     };
     
-    const handleRefundClick = async () => { /* ... (refund logic is correct) ... */ };
+    const handleRefundClick = async () => {
+        if (!contract || !address || !userHasCommitted || userHasRefunded || status !== 'Cancelled') {
+            setErrorMessage("Cannot refund: check conditions (campaign cancelled, committed status, not yet refunded).");
+            return;
+        }
+        setErrorMessage("");
+        setIsRefunding(true);
+        try {
+            await contract.methods.refund(id).send({ from: address });
+            await fetchCampaignData(contract, address);
+        } catch (error) {
+            console.error("Refund transaction failed:", error);
+            setErrorMessage(error.message);
+        } finally {
+            setIsRefunding(false);
+        }
+    };
 
-    // --- UI Helpers (Unchanged) ---
+    // --- UI Helpers ---
     const openModal = (e) => { e.preventDefault(); setIsModalOpen(true); };
     const closeModal = () => setIsModalOpen(false);
     const getStatusClass = (s) => s.toLowerCase().replace(/\s+/g, '-');
@@ -115,18 +168,26 @@ export default function GroupBuy() {
         if (isLoading) return <p>Loading campaign data...</p>;
         if (!campaignData) return <p>Campaign #{id} could not be found.</p>;
 
-        // The displayStatus logic from before is still correct.
         let displayStatus = status;
         if (status === 'Open' && userHasCommitted) { displayStatus = 'Committed'; }
+
+        // --- NEW FIX: Get campaign-specific name and image from metadata ---
+        const campaignIdNum = parseInt(id); // Convert URL param string to number
+        const metadata = CAMPAIGN_METADATA[campaignIdNum] || { 
+            name: `[GB] Campaign #${id}`, 
+            image: "/placeholder.png" 
+        };
 
         return (
             <div className="groupbuy-card">
                 <div className="groupbuy-image">
                     <div className={`status-badge-detail ${getStatusClass(displayStatus)}`}>{displayStatus}</div>
-                    <img src={process.env.PUBLIC_URL + '/keyboard.png'} alt="Item" />
+                    {/* Use the dynamically retrieved image */}
+                    <img src={process.env.PUBLIC_URL + metadata.image} alt={metadata.name} />
                 </div>
                 <div className="groupbuy-content">
-                    <h2>[GB] SHA-7 Mechanical Keyboard</h2>
+                    {/* Use the dynamically retrieved name */}
+                    <h2>{metadata.name}</h2>
                     <p className="price">{ethers.utils.formatEther(campaignData.unitPrice)} ETH</p>
                     <p className="commit-status">{campaignData.committed} / {campaignData.goal} committed</p>
                     <div className="progress-bar"><div className="progress-fill" style={{ width: `${progressPercent}%` }}></div></div>
@@ -143,7 +204,7 @@ export default function GroupBuy() {
                         </>
                     ))}
                     {status === 'Order Confirmed' && <div className="status-message-box order-confirmed"><p>🎉 Goal reached! This order is confirmed.</p></div>}
-                    {status === 'Cancelled' && (userHasCommitted ? (userHasRefunded ? (
+                    {status === 'Cancelled' && (userHasCommitted ? (isRefunding ? ( // Corrected variable
                         <div className="status-message-box committed"><p>Your refund has been processed.</p></div>
                     ) : (
                         <div className="refund-section"><p>This campaign was cancelled.</p><button className="commit-button cancel" onClick={handleRefundClick} disabled={isRefunding}>{isRefunding ? "Processing..." : "CLAIM REFUND"}</button></div>
@@ -173,14 +234,25 @@ export default function GroupBuy() {
             <h1 className="main-header">SHA-7 Group Buy (Campaign #{id})</h1>
             {errorMessage && <div className="error-message-box"><p>{errorMessage}</p></div>}
             
-            {/* --- FIX #1: The connect button is gone. It now shows a simple loading/connecting state --- */}
             {!address ? (
                 <div className="connect-wallet-container">
                     <p>Connecting to wallet...</p>
                 </div>
             ) : <GroupBuyPage />}
             
-            {isModalOpen && <Modal onClose={closeModal}>{/* ... Modal Content ... */}</Modal>}
+            {isModalOpen && <Modal onClose={closeModal}>
+                <div className="policy-content">
+                    <h3>Group Buy Policy</h3>
+                    <p>By participating in this group buy, you agree to the following terms:</p>
+                    <ul>
+                        <li>All sales are final after the group buy successfully concludes.</li>
+                        <li>Refunds are only issued if the group buy does not meet its funding goal by the deadline.</li>
+                        <li>Estimated fulfillment dates are subject to change due to manufacturing delays.</li>
+                        <li>You understand that this is a pre-order for a product that is not yet manufactured.</li>
+                        <li>By clicking "ORDER NOW", you commit to purchasing the item at the listed unit price.</li>
+                    </ul>
+                </div>
+            </Modal>}
             <GlobalToolBar/>
         </div>
     );
