@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from "react-router-dom";
 import Web3 from 'web3';
 
@@ -19,46 +19,30 @@ export default function GroupBuy() {
     const [userHasCommitted, setUserHasCommitted] = useState(false);
     const [userHasRefunded, setUserHasRefunded] = useState(false);
     const [status, setStatus] = useState("Connect Wallet");
-    const [isLoading, setIsLoading] = useState(true);
-    const isCommitting =false;
-    const isRefunding =false;
+    const [isLoading, setIsLoading] = useState(false); // Set to false initially
+    const [isCommitting, setIsCommitting] = useState(false);
+    const [isRefunding, setIsRefunding] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isTimelineOpen, setIsTimelineOpen] = useState(false); // State for the timeline toggle
+    const [isTimelineOpen, setIsTimelineOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    // --- Wallet Connection ---
-    const connectAndInitialize = useCallback(async () => {
-        if (!window.ethereum) { alert("Please install MetaMask!"); return; }
-        setErrorMessage("");
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            setAddress(accounts[0]);
-            const web3Instance = new Web3(window.ethereum);
-            const contractInstance = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-            setContract(contractInstance);
-        } catch (error) {
-            console.error("Error connecting wallet:", error);
-            setErrorMessage(error.message);
-        }
-    }, []);
-
     // --- Data Fetching ---
-    const fetchCampaignData = useCallback(async () => {
-        if (!contract || !address) return;
+    // This function will be called AFTER the user connects their wallet.
+    const fetchCampaignData = useCallback(async (contractInstance, userAddress) => {
         setIsLoading(true);
         setErrorMessage("");
         try {
-            const progress = await contract.methods.getProgress(id).call();
+            const progress = await contractInstance.methods.getProgress(id).call();
             if (progress.organizer === '0x0000000000000000000000000000000000000000') {
                 setStatus("Not Found"); setCampaignData(null); return;
             }
-            const hasCommitted = await contract.methods.hasCommitted(id, address).call();
-            const hasRefunded = await contract.methods.hasRefunded(id, address).call();
-            const fullCampaign = await contract.methods.campaigns(id).call();
+            const hasCommitted = await contractInstance.methods.hasCommitted(id, userAddress).call();
+            const hasRefunded = await contractInstance.methods.hasRefunded(id, userAddress).call();
+            const fullCampaign = await contractInstance.methods.campaigns(id).call();
             const data = { committed: parseInt(progress.committed), goal: parseInt(progress.goal), successful: progress.successful, deadline: parseInt(progress.deadline), unitPrice: fullCampaign.unitPrice };
             setCampaignData(data);
-            setUserHasCommitted(hasCommitted);
+            setUserHasCommitted(false);
             setUserHasRefunded(hasRefunded);
             if (data.successful) setStatus('Order Confirmed');
             else if (Date.now() / 1000 > data.deadline && data.deadline !== 0) setStatus('Cancelled');
@@ -66,19 +50,52 @@ export default function GroupBuy() {
         } catch (error) {
             console.error("CRITICAL ERROR while fetching data:", error);
             setStatus("Error");
-            setErrorMessage("Could not read from contract. Check your config.js and network.");
+            setErrorMessage("Could not read from contract. Check config.js and network.");
         } finally {
             setIsLoading(false);
         }
-    }, [contract, address, id]);
+    }, [id]);
 
-    // --- Effects to run logic on load ---
-    useEffect(() => { connectAndInitialize(); }, [connectAndInitialize]);
-    useEffect(() => { if (contract && address) { fetchCampaignData(); } }, [contract, address, fetchCampaignData]);
+    // --- Wallet Connection, called by the button ---
+    const connectAndInitialize = async () => {
+        if (!window.ethereum) { alert("Please install MetaMask!"); return; }
+        setErrorMessage("");
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const userAddress = accounts[0];
+            const web3Instance = new Web3(window.ethereum);
+            const contractInstance = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+            
+            setAddress(userAddress);
+            setContract(contractInstance);
 
-    // --- Transaction Handlers ---
-    const handleCommitClick = async () => { /* ... (unchanged) ... */ };
-    const handleRefundClick = async () => { /* ... (unchanged) ... */ };
+            // After connecting, immediately fetch the data.
+            await fetchCampaignData(contractInstance, userAddress);
+
+        } catch (error) {
+            console.error("Error connecting wallet:", error);
+            setErrorMessage(error.message);
+        }
+    };
+
+    // --- Transaction Handlers (Now Correct) ---
+    const handleCommitClick = async () => {
+        if (!contract || !address || !isChecked || userHasCommitted || status !== 'Open' || !campaignData) return;
+        setErrorMessage("");
+        setIsCommitting(true);
+        try {
+            await contract.methods.commit(id, '0x0000000000000000000000000000000000000000', 0, 0, 0)
+                .send({ from: address, value: campaignData.unitPrice });
+            await fetchCampaignData(contract, address);
+        } catch (error) {
+            console.error("Commit transaction failed:", error);
+            setErrorMessage(error.message);
+        } finally {
+            setIsCommitting(false);
+        }
+    };
+    
+    const handleRefundClick = async () => { /* ... (refund logic is correct) ... */ };
 
     // --- UI Helpers ---
     const openModal = (e) => { e.preventDefault(); setIsModalOpen(true); };
@@ -90,11 +107,8 @@ export default function GroupBuy() {
         if (isLoading) return <p>Loading campaign data...</p>;
         if (!campaignData) return <p>Campaign #{id} could not be found.</p>;
 
-        // --- FIX #1: Determine the correct status to display on the badge ---
         let displayStatus = status;
-        if (status === 'Open' && userHasCommitted) {
-            displayStatus = 'Committed';
-        }
+        if (status === 'Open' && userHasCommitted) { displayStatus = 'Committed'; }
 
         return (
             <div className="groupbuy-card">
@@ -108,7 +122,6 @@ export default function GroupBuy() {
                     <p className="commit-status">{campaignData.committed} / {campaignData.goal} committed</p>
                     <div className="progress-bar"><div className="progress-fill" style={{ width: `${progressPercent}%` }}></div></div>
                     
-                    {/* --- Dynamic Action Area (Unchanged) --- */}
                     {status === 'Open' && (userHasCommitted ? (
                         <div className="status-message-box committed"><p>You have already joined this group buy!</p></div>
                     ) : (
@@ -129,7 +142,6 @@ export default function GroupBuy() {
                         <div className="status-message-box cancelled"><p>This campaign was cancelled.</p></div>
                     ))}
                     
-                    {/* --- FIX #2: Timeline is now always visible --- */}
                     <div className="timeline">
                         <button className="timeline-toggle" onClick={() => setIsTimelineOpen(o => !o)} aria-expanded={isTimelineOpen}>
                             <strong>Timeline</strong>
@@ -151,11 +163,18 @@ export default function GroupBuy() {
         <div className="groupbuy-container">
             <h1 className="main-header">SHA-7 Group Buy (Campaign #{id})</h1>
             {errorMessage && <div className="error-message-box"><p>{errorMessage}</p></div>}
+            
+            {/* --- THIS IS THE FIX --- */}
+            {/* If the wallet is not connected, show a button to connect it. */}
             {!address ? (
                 <div className="connect-wallet-container">
                     <p>Please connect your wallet to view this campaign.</p>
+                    <button className="commit-button" onClick={connectAndInitialize}>
+                        CONNECT WALLET
+                    </button>
                 </div>
             ) : <GroupBuyPage />}
+            
             {isModalOpen && <Modal onClose={closeModal}>{/* ... Modal Content ... */}</Modal>}
             <GlobalToolBar/>
         </div>
