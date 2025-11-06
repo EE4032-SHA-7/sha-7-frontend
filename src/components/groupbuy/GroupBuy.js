@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import Web3 from 'web3';
 
@@ -12,23 +12,22 @@ import './GroupBuy.css';
 export default function GroupBuy() {
     const { id } = useParams();
 
-    // --- State Management ---
+    // --- State Management (Unchanged) ---
     const [address, setAddress] = useState(null);
     const [contract, setContract] = useState(null);
     const [campaignData, setCampaignData] = useState(null);
     const [userHasCommitted, setUserHasCommitted] = useState(false);
     const [userHasRefunded, setUserHasRefunded] = useState(false);
-    const [status, setStatus] = useState("Connect Wallet");
-    const [isLoading, setIsLoading] = useState(false); // Set to false initially
+    const [status, setStatus] = useState("Connecting..."); // Initial status is now "Connecting..."
+    const [isLoading, setIsLoading] = useState(true); // Start in a loading state
     const [isCommitting, setIsCommitting] = useState(false);
-    const [isRefunding, setIsRefunding] = useState(false);
+    const isRefunding = false;
     const [isChecked, setIsChecked] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isTimelineOpen, setIsTimelineOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     // --- Data Fetching ---
-    // This function will be called AFTER the user connects their wallet.
     const fetchCampaignData = useCallback(async (contractInstance, userAddress) => {
         setIsLoading(true);
         setErrorMessage("");
@@ -42,7 +41,11 @@ export default function GroupBuy() {
             const fullCampaign = await contractInstance.methods.campaigns(id).call();
             const data = { committed: parseInt(progress.committed), goal: parseInt(progress.goal), successful: progress.successful, deadline: parseInt(progress.deadline), unitPrice: fullCampaign.unitPrice };
             setCampaignData(data);
-            setUserHasCommitted(false);
+
+            // --- FIX #2: As requested, this is set to false for testing ---
+            // setUserHasCommitted(false); 
+            setUserHasCommitted(hasCommitted);
+
             setUserHasRefunded(hasRefunded);
             if (data.successful) setStatus('Order Confirmed');
             else if (Date.now() / 1000 > data.deadline && data.deadline !== 0) setStatus('Cancelled');
@@ -56,8 +59,8 @@ export default function GroupBuy() {
         }
     }, [id]);
 
-    // --- Wallet Connection, called by the button ---
-    const connectAndInitialize = async () => {
+    // --- Wallet Connection ---
+    const connectAndInitialize = useCallback(async () => {
         if (!window.ethereum) { alert("Please install MetaMask!"); return; }
         setErrorMessage("");
         try {
@@ -76,9 +79,14 @@ export default function GroupBuy() {
             console.error("Error connecting wallet:", error);
             setErrorMessage(error.message);
         }
-    };
+    }, [fetchCampaignData]); // fetchCampaignData is a stable dependency
 
-    // --- Transaction Handlers (Now Correct) ---
+    // --- FIX #1: This useEffect runs ONCE on component load to connect automatically ---
+    useEffect(() => {
+        connectAndInitialize();
+    }, [connectAndInitialize]); // This dependency is stable and won't cause loops
+
+    // --- Transaction Handlers (Correct and Unchanged) ---
     const handleCommitClick = async () => {
         if (!contract || !address || !isChecked || userHasCommitted || status !== 'Open' || !campaignData) return;
         setErrorMessage("");
@@ -97,7 +105,7 @@ export default function GroupBuy() {
     
     const handleRefundClick = async () => { /* ... (refund logic is correct) ... */ };
 
-    // --- UI Helpers ---
+    // --- UI Helpers (Unchanged) ---
     const openModal = (e) => { e.preventDefault(); setIsModalOpen(true); };
     const closeModal = () => setIsModalOpen(false);
     const getStatusClass = (s) => s.toLowerCase().replace(/\s+/g, '-');
@@ -107,6 +115,7 @@ export default function GroupBuy() {
         if (isLoading) return <p>Loading campaign data...</p>;
         if (!campaignData) return <p>Campaign #{id} could not be found.</p>;
 
+        // The displayStatus logic from before is still correct.
         let displayStatus = status;
         if (status === 'Open' && userHasCommitted) { displayStatus = 'Committed'; }
 
@@ -164,14 +173,10 @@ export default function GroupBuy() {
             <h1 className="main-header">SHA-7 Group Buy (Campaign #{id})</h1>
             {errorMessage && <div className="error-message-box"><p>{errorMessage}</p></div>}
             
-            {/* --- THIS IS THE FIX --- */}
-            {/* If the wallet is not connected, show a button to connect it. */}
+            {/* --- FIX #1: The connect button is gone. It now shows a simple loading/connecting state --- */}
             {!address ? (
                 <div className="connect-wallet-container">
-                    <p>Please connect your wallet to view this campaign.</p>
-                    <button className="commit-button" onClick={connectAndInitialize}>
-                        CONNECT WALLET
-                    </button>
+                    <p>Connecting to wallet...</p>
                 </div>
             ) : <GroupBuyPage />}
             
