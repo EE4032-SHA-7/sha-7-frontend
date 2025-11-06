@@ -23,26 +23,20 @@ const CAMPAIGN_METADATA = {
         image: "/phone_case.png"
     },
     // Add more entries here for Campaign #3, #4, etc.
-    // Ensure you have placeholder images in your public folder for these paths
-    // Example:
-    // 3: { name: "[GB] Smart Home Hub", image: "/smart_hub.png" },
-    // 4: { name: "[GB] Ergonomic Mouse", image: "/ergonomic_mouse.png" }
 };
 
 const ProductCard = ({ campaign }) => {
-    // Determine campaign metadata or use a generic one if not found
     const metadata = CAMPAIGN_METADATA[campaign.id] || { 
         name: `[GB] Campaign #${campaign.id}`, 
-        image: "/placeholder.png" // Ensure you have a generic placeholder.png in your public folder
+        image: "/placeholder.png"
     };
 
     let displayStatus = 'Open';
     if (campaign.successful) {
-        displayStatus = 'Successful'; // Final states have highest priority
+        displayStatus = 'Successful';
     } else if (Date.now() / 1000 > campaign.deadline && campaign.deadline !== 0) {
         displayStatus = 'Failed';
     } else if (campaign.userHasJoined) {
-        // If it's still open, check the personal status
         displayStatus = 'Committed';
     }
     
@@ -52,11 +46,9 @@ const ProductCard = ({ campaign }) => {
         <div className="product-card-landing">
             <div className={`status-badge ${displayStatus.toLowerCase()}`}>{displayStatus}</div>
             <div className="product-image-landing">
-                {/* Use the image from metadata or placeholder */}
                 <img src={process.env.PUBLIC_URL + metadata.image} alt={metadata.name} />
             </div>
             <div className="product-info-landing">
-                {/* Use the name from metadata or generic */}
                 <h3>{metadata.name}</h3>
                 <p className="price-landing">{ethers.utils.formatEther(campaign.unitPrice)} ETH</p>
                 <div className="status-tracker-landing">
@@ -71,12 +63,10 @@ const ProductCard = ({ campaign }) => {
 export default function GroupBuyLanding(props) {
     const [campaigns, setCampaigns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isCreating, setIsCreating] = useState(false); // Reinstated as state
+    const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState("");
 
-    // --- Core function to fetch all campaign data from the blockchain ---
     const fetchCampaigns = useCallback(async () => {
-        // --- Reverted to your stable version's logic for getting userAddress ---
         if (!window.ethereum) { 
             console.log("MetaMask not installed, cannot fetch campaigns.");
             setIsLoading(false);
@@ -84,19 +74,17 @@ export default function GroupBuyLanding(props) {
         }
         
         setIsLoading(true);
-        setError(""); // Clear any previous errors
+        setError("");
 
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const userAddress = accounts[0]; // Get user address inside the function
+            const userAddress = accounts[0];
             
             const web3Instance = new Web3(window.ethereum);
             const contract = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
-            // --- 1. Fetch the public data for all campaigns ---
-            // Using a fixed loop (0 to 9) as in your stable version
             const campaignPromises = [];
-            const MAX_CAMPAIGNS_TO_FETCH = 10; // Or dynamically get from contract if available
+            const MAX_CAMPAIGNS_TO_FETCH = 10;
             for (let i = 0; i < MAX_CAMPAIGNS_TO_FETCH; i++) {
                 campaignPromises.push(contract.methods.campaigns(i).call());
             }
@@ -106,7 +94,6 @@ export default function GroupBuyLanding(props) {
                 .map((c, index) => ({ ...c, id: index }))
                 .filter(c => c.organizer !== '0x0000000000000000000000000000000000000000');
             
-            // --- 2. For each active campaign, fetch progress and the user's personal commitment status ---
             if (activeCampaignsData.length > 0) {
                 const detailedCampaignPromises = activeCampaignsData.map(async (campaign) => {
                     try {
@@ -123,78 +110,88 @@ export default function GroupBuyLanding(props) {
                         };
                     } catch (detailError) {
                         console.warn(`Failed to fetch details for campaign ID ${campaign.id}:`, detailError.message);
-                        return { ...campaign, committed: 0, goal: 0, successful: false, userHasJoined: false }; // Return a fallback
+                        return { ...campaign, committed: 0, goal: 0, successful: false, userHasJoined: false };
                     }
                 });
                 const campaignsWithFullDetails = await Promise.all(detailedCampaignPromises);
                 setCampaigns(campaignsWithFullDetails);
             } else {
-                setCampaigns([]); // No active campaigns found
+                setCampaigns([]);
             }
         } catch (fullFetchError) {
-            // Catch any critical errors during the overall fetch process
             console.error("CRITICAL ERROR during fetchCampaigns:", fullFetchError);
-            setError(`Failed to fetch campaigns: ${fullFetchError.message}. Please ensure you are on the correct network (e.g., Sepolia).`);
+            setError(`Failed to fetch campaigns: ${fullFetchError.message}. Please ensure you are on the correct network.`);
         } finally {
-            setIsLoading(false); // Always clear loading state
+            setIsLoading(false);
         }
-    }, []); // Removed props.address from dependencies because userAddress is fetched internally
+    }, []);
 
-    // --- useEffect to trigger campaign fetching on initial load and connection status ---
     useEffect(() => {
-        // This useEffect now primarily depends on props.isConnected
         if (props.isConnected) {
             fetchCampaigns();
         } else {
-            // If not connected, clear campaigns and loading state
             setCampaigns([]);
             setIsLoading(false);
         }
-    }, [props.isConnected, fetchCampaigns]); // fetchCampaigns is stable, props.isConnected changes
+    }, [props.isConnected, fetchCampaigns]);
 
-    // --- Function to handle creating a new campaign ---
-    // This assumes your contract's 'commit' function is designed to *create* a new campaign
-    // if the 'id' provided does not yet exist, and it takes these specific parameters.
+    // --- FUNCTION WITH THE FIX ---
     const handleCreateNewCampaign = async () => {
         if (!window.ethereum) { alert("Please install MetaMask."); return; }
-        // Ensure wallet is connected for creating campaign
-        if (!props.isConnected || !props.address) { 
+        
+        // We still check props.isConnected as a general guard.
+        if (!props.isConnected) { 
             setError("Please connect your wallet to create a campaign."); 
             return; 
         }
+
+        const durationInput = window.prompt("Enter the duration for the new campaign (in days):", "30");
+        if (durationInput === null) {
+            console.log("Campaign creation cancelled by user.");
+            return;
+        }
+
+        const durationInDays = parseInt(durationInput, 10);
+        if (isNaN(durationInDays) || durationInDays <= 0) {
+            alert("Invalid duration. Please enter a positive number for the days.");
+            setError("Invalid duration. Please enter a positive number for the days.");
+            return;
+        }
         
         setIsCreating(true);
-        setError(""); // Clear previous errors
+        setError("");
 
         try {
+            // FIX: We get the userAddress directly here, instead of relying on props.address.
+            // This avoids any timing issues.
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const userAddress = accounts[0]; // Get user address for sending the transaction
+            const userAddress = accounts[0];
+
+            // Add a check to ensure we actually got an address back.
+            if (!userAddress) {
+                throw new Error("Could not retrieve wallet address. Please unlock MetaMask and try again.");
+            }
             
             const web3Instance = new Web3(window.ethereum);
             const contract = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
             
-            // Determine the next campaign ID.
-            // Based on your stable version's loop of 0-9, we'll try to create the next available.
-            // For robust creation, using `campaigns.length` is reasonable here.
             const nextCampaignIdToCreate = campaigns.length; 
-
             const CAMPAIGN_PRICE_ETH = "0.001";
             const CAMPAIGN_GOAL = 10;
-            const CAMPAIGN_DURATION_DAYS = 30; // 30 days
-            const COMPANY_ADDRESS = userAddress; // The creator is the organizer
+            const CAMPAIGN_DURATION_DAYS = durationInDays; 
+            const COMPANY_ADDRESS = userAddress;
 
             const priceInWei = ethers.utils.parseEther(CAMPAIGN_PRICE_ETH);
 
-            // Call the contract method to create/commit
             await contract.methods.commit(
                 nextCampaignIdToCreate,
                 COMPANY_ADDRESS,
                 priceInWei.toString(),
                 CAMPAIGN_GOAL,
                 CAMPAIGN_DURATION_DAYS
-            ).send({ from: userAddress, value: priceInWei.toString() }); // Include value if the first commit also pays the unit price
+            ).send({ from: userAddress, value: priceInWei.toString() });
 
-            await fetchCampaigns(); // Re-fetch campaigns to update the list
+            await fetchCampaigns();
         } catch (err) {
             console.error("Failed to create new campaign:", err);
             setError(`Failed to create new campaign: ${err.message}`);
@@ -205,17 +202,20 @@ export default function GroupBuyLanding(props) {
 
     const LandingPage = () => (
         <div className="groupbuy-landing-page">
-            <h1>Active Group Buys</h1>
-            <div className="create-campaign-section">
-                <button 
-                    className="commit-button" 
-                    onClick={handleCreateNewCampaign}
-                    disabled={isCreating || !props.isConnected} // Disable if not connected or already creating
-                >
-                    {isCreating ? "Creating..." : "Create New Group Buy"}
-                </button>
-                {!props.isConnected && <p className="wallet-prompt">Connect your wallet to create a new group buy.</p>}
+            <div className="landing-header-container">
+                <h1>Active Group Buys</h1>
+                <div className="create-campaign-section">
+                    <button 
+                        className="commit-button" 
+                        onClick={handleCreateNewCampaign}
+                        disabled={isCreating || !props.isConnected}
+                    >
+                        {isCreating ? "Creating..." : "Create New Group Buy"}
+                    </button>
+                    {!props.isConnected && <p className="wallet-prompt">Connect your wallet to start.</p>}
+                </div>
             </div>
+
             {error && <div className="error-message-box"><p>{error}</p></div>}
             {isLoading ? <p>Loading active campaigns...</p> : (
                 campaigns.length > 0 ? (
@@ -228,8 +228,7 @@ export default function GroupBuyLanding(props) {
                     </div>
                 ) : (
                     <div className="start-campaign-container">
-                        <p>There are no active group buys. Be the first to start one!</p>
-                        {props.isConnected && <p>Click "Create New Group Buy" above to begin!</p>}
+                        <p>There are no active group buys yet. Be the first to start one!</p>
                     </div>
                 )
             )}
@@ -239,7 +238,6 @@ export default function GroupBuyLanding(props) {
 
     return (
         <div>
-            {/* If not connected, navigate to the connection page, otherwise show the landing page */}
             {props.isConnected ? <LandingPage /> : <Navigate to='/sha-frontend' />}
         </div>
     );
