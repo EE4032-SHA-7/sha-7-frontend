@@ -153,3 +153,51 @@
 .status-reached {
     color: #28a745;
 }
+
+/* Add these new styles to your groupbuyLanding.css file */
+
+.landing-header-container {
+    display: flex;
+    justify-content: space-between; /* This pushes the title and button to opposite ends */
+    align-items: center;            /* This vertically aligns them nicely */
+    margin-bottom: 4rem;            /* Adds space below the header section */
+}
+
+.landing-header-container h1 {
+    margin: 0; /* Removes default heading margin to help with alignment */
+}
+
+/* Modify the existing create-campaign-section */
+.create-campaign-section {
+    text-align: right;
+    /* Remove any previous margin or centering styles if they exist */
+}
+
+/* Style the button inside this section to be smaller and neater */
+.create-campaign-section .commit-button {
+    padding: 10px 20px; /* Reduces the button size */
+    font-size: 0.9rem;   /* Makes the text smaller */
+    font-weight: 600;
+    /* Add other base styles if your .commit-button isn't global */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.create-campaign-section .commit-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.create-campaign-section .commit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.wallet-prompt {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    color: #666;
+}
