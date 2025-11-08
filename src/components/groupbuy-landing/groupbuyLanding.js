@@ -35,7 +35,7 @@ const ProductCard = ({ campaign }) => {
     if (campaign.successful) {
         displayStatus = 'Successful';
     } else if (Date.now() / 1000 > campaign.deadline && campaign.deadline !== 0) {
-        displayStatus = 'Failed';
+        displayStatus = 'Cancelled';
     } else if (campaign.userHasJoined) {
         displayStatus = 'Committed';
     }
