@@ -84,7 +84,7 @@
 .status-badge.open { background-color: #007bff; } /* Blue */
 .status-badge.successful { background-color: #28a745; } /* Green */
 .status-badge.committed { background-color: #28a745; } /* Green */
-.status-badge.failed { background-color: #6c757d; } /* Gray */
+.status-badge.cancelled { background-color: #6c757d; } /* Gray */
 .status-badge.closed { background-color: #6c757d; } /* Gray */
 .status-badge.order-confirmed { background-color: #6f42c1; } /* Purple */
 .status-badge.order-completed { background-color: #17a2b8; } /* Teal/Cyan */
