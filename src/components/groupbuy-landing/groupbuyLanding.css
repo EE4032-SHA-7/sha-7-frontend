@@ -107,12 +107,15 @@
 }
 
 /* Badge Colors */
+/* Badge Colors */
 .status-badge.open { background-color: #007bff; }
-.status-badge.successful { background-color: #28a745; }
 .status-badge.committed { background-color: #28a745; }
-.status-badge.failed { background-color: #dc3545; } /* Added a red for failed */
+.status-badge.failed { background-color: #dc3545; }
 .status-badge.cancelled { background-color: #6c757d; }
 .status-badge.closed { background-color: #6c757d; }
+
+/* --- NEW / MODIFIED STYLE FOR CONSISTENCY --- */
+.status-badge.order-confirmed { background-color: #6f42c1; } /* Purple, matches detail page */
 
 /* --- Card Image --- */
 .product-image-landing img {

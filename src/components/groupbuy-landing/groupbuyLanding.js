@@ -33,7 +33,7 @@ const ProductCard = ({ campaign }) => {
 
     let displayStatus = 'Open';
     if (campaign.successful) {
-        displayStatus = 'Successful';
+        displayStatus = 'Order Confirmed';
     } else if (Date.now() / 1000 > campaign.deadline && campaign.deadline !== 0) {
         displayStatus = 'Cancelled';
     } else if (campaign.userHasJoined) {
