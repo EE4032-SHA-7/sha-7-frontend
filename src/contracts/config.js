@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x927f3BBcca69014E420a06c3856F1a155cA4a9Bf";
+export const CONTRACT_ADDRESS = "0x9CF11BA7C6589547b8aCa5bA93719D69845D0F74";
 export const CONTRACT_ABI = [
 	{
 		"anonymous": false,
@@ -67,7 +67,7 @@ export const CONTRACT_ABI = [
 			},
 			{
 				"internalType": "uint256",
-				"name": "durationDays",
+				"name": "durationSeconds",
 				"type": "uint256"
 			}
 		],
@@ -336,4 +336,4 @@ export const CONTRACT_ABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-];
+]

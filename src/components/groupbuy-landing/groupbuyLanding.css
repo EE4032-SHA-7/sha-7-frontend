@@ -1,71 +1,97 @@
-/* groupbuyLanding.css */
+/* ==========================================================================
+   Group Buy Landing Page - Final Corrected Stylesheet
+   ========================================================================== */
 
+/* --- General Page Layout --- */
 .groupbuy-landing-page {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 3rem; /* Increased from 2rem for more edge spacing */
+    padding: 3rem;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #333;
 }
 
-.landing-header,
-.groupbuy-landing-page > h1 {
-    text-align: center;
-    margin-bottom: 2rem; /* Consistent bottom margin for the main title */
+/* --- Page Header --- */
+.landing-header-container {
+    display: flex;
+    justify-content: space-between; /* Pushes title and button to opposite ends */
+    align-items: center;            /* Vertically aligns them */
+    margin-bottom: 4rem;            /* Space below the entire header */
 }
 
-.groupbuy-landing-page > h1 {
+.landing-header-container h1 {
+    margin: 0; /* Remove default margin for better alignment */
     font-size: 2.8rem;
     font-weight: 700;
 }
 
-.landing-header p {
-    font-size: 1.2rem;
+/* --- "Create New Group Buy" Button Section --- */
+.create-campaign-section .commit-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.create-campaign-section .commit-button:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+.create-campaign-section .commit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.wallet-prompt {
+    font-size: 0.8rem;
+    margin-top: 5px;
     color: #666;
-    margin-bottom: 3rem;
+    text-align: right; /* Aligns with the button */
 }
 
-/* Added styles for the button container to create vertical space */
-.create-campaign-section {
-    text-align: center;
-    margin-bottom: 4rem; /* Significantly increased spacing below the create button */
-}
-
+/* --- Product Grid Layout --- */
 .product-grid-landing {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 3rem; /* --- MAJOR SPACING INCREASE: Was 2rem, now 3rem --- */
+    gap: 3rem;
+}
+
+/* --- Product Card --- */
+/*
+ *  THE FIX IS HERE:
+ *  The generic 'a' selector was replaced with '.product-grid-landing a'.
+ *  This makes the rule specific, so it only affects the product card links
+ *  and no longer affects the navigation links in the footer.
+*/
+.product-grid-landing a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .product-card-landing {
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    overflow: hidden; /* Important for border-radius on image */
+    position: relative; /* Anchor for the status badge */
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    position: relative; /* Needed for the status badge positioning */
+    display: flex;
+    flex-direction: column; /* Stacks image and info vertically */
+    height: 100%; /* Ensures all cards in a row are the same height */
 }
 
-.product-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.product-link:hover .product-card-landing {
+.product-grid-landing a:hover .product-card-landing {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.product-card-landing.disabled {
-    cursor: not-allowed;
-    filter: grayscale(20%);
-    opacity: 0.9;
-}
-
-/* --- STATUS BADGE STYLES --- */
+/* --- Status Badge (Positioned over the image) --- */
 .status-badge {
     position: absolute;
     top: 12px;
@@ -80,16 +106,15 @@
     letter-spacing: 0.5px;
 }
 
-/* Color coding for each status (merged from your provided styles) */
-.status-badge.open { background-color: #007bff; } /* Blue */
-.status-badge.successful { background-color: #28a745; } /* Green */
-.status-badge.committed { background-color: #28a745; } /* Green */
-.status-badge.cancelled { background-color: #6c757d; } /* Gray */
-.status-badge.closed { background-color: #6c757d; } /* Gray */
-.status-badge.order-confirmed { background-color: #6f42c1; } /* Purple */
-.status-badge.order-completed { background-color: #17a2b8; } /* Teal/Cyan */
+/* Badge Colors */
+.status-badge.open { background-color: #007bff; }
+.status-badge.successful { background-color: #28a745; }
+.status-badge.committed { background-color: #28a745; }
+.status-badge.failed { background-color: #dc3545; } /* Added a red for failed */
+.status-badge.cancelled { background-color: #6c757d; }
+.status-badge.closed { background-color: #6c757d; }
 
-
+/* --- Card Image --- */
 .product-image-landing img {
     width: 100%;
     height: 220px;
@@ -97,28 +122,29 @@
     display: block;
 }
 
+/* --- Card Info Section (Centered) --- */
 .product-info-landing {
     padding: 1.5rem;
+    flex-grow: 1; /* Allows this section to fill remaining card height */
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    text-align: center; /* This centers all text elements (h3, p) */
 }
 
 .product-info-landing h3 {
     margin: 0 0 0.5rem;
     font-size: 1.25rem;
-    padding-right: 70px; /* Padding to prevent text from overlapping with the badge */
 }
 
 .price-landing {
     font-size: 1.15rem;
     font-weight: 600;
     color: #007bff;
-    margin-bottom: 1.5rem; /* Increased from 1rem for more spacing */
+    margin-bottom: 1.5rem;
 }
 
 .status-tracker-landing {
-    margin-bottom: 1.5rem; /* Increased from 1rem for more spacing */
+    margin-top: auto; /* Pushes this to the bottom of the info section */
 }
 
 .status-tracker-landing p {
@@ -132,72 +158,14 @@
     border-radius: 5px;
     height: 10px;
     overflow: hidden;
+    /* This centers the progress bar block element itself */
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .progress-fill-landing {
     background-color: #28a745;
     height: 100%;
-}
-
-.goal-status-landing {
-    margin-top: auto;
-    font-weight: bold;
-    text-align: right;
-    font-size: 0.95rem;
-}
-
-.status-progress {
-    color: #ff9800;
-}
-
-.status-reached {
-    color: #28a745;
-}
-
-/* Add these new styles to your groupbuyLanding.css file */
-
-.landing-header-container {
-    display: flex;
-    justify-content: space-between; /* This pushes the title and button to opposite ends */
-    align-items: center;            /* This vertically aligns them nicely */
-    margin-bottom: 4rem;            /* Adds space below the header section */
-}
-
-.landing-header-container h1 {
-    margin: 0; /* Removes default heading margin to help with alignment */
-}
-
-/* Modify the existing create-campaign-section */
-.create-campaign-section {
-    text-align: right;
-    /* Remove any previous margin or centering styles if they exist */
-}
-
-/* Style the button inside this section to be smaller and neater */
-.create-campaign-section .commit-button {
-    padding: 10px 20px; /* Reduces the button size */
-    font-size: 0.9rem;   /* Makes the text smaller */
-    font-weight: 600;
-    /* Add other base styles if your .commit-button isn't global */
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.create-campaign-section .commit-button:hover:not(:disabled) {
-    background-color: #0056b3;
-}
-
-.create-campaign-section .commit-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-.wallet-prompt {
-    font-size: 0.8rem;
-    margin-top: 5px;
-    color: #666;
+    border-radius: 5px; /* Ensures fill is also rounded */
 }
