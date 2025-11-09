@@ -44,7 +44,7 @@ const ProductCard = ({ campaign }) => {
 
     return (
         <div className="product-card-landing">
-            <div className={`status-badge ${displayStatus.toLowerCase()}`}>{displayStatus}</div>
+            <div className={`status-badge ${displayStatus.toLowerCase().replace(/\s+/g, '-')}`}>{displayStatus}</div>
             <div className="product-image-landing">
                 <img src={process.env.PUBLIC_URL + metadata.image} alt={metadata.name} />
             </div>

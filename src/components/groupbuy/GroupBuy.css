@@ -258,3 +258,4 @@
 .status-badge-detail.closed { background-color: #6c757d; }
 .status-badge-detail.order-confirmed { background-color: #6f42c1; }
 .status-badge-detail.order-completed { background-color: #17a2b8; }
+.status-badge-detail.cancelled { background-color: #6c757d; }
