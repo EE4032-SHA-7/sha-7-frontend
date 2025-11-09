@@ -11,23 +11,23 @@ import "./groupbuyLanding.css";
 // --- A mapping to define the look of each campaign ID ---
 const CAMPAIGN_METADATA = {
     0: {
-        name: "[GB] SHA-7 Mechanical Keyboard",
+        name: "SHA-7 Mechanical Keyboard",
         image: "/keyboard.png"
     },
     1: {
-        name: "[GB] Hydro Flask Water Bottle",
-        image: "/water_bottle.png" 
+        name: "Hydro Flask Water Bottle",
+        image: "/water_bottle.png"
     },
     2: {
-        name: "[GB] Custom Phone Case",
+        name: "Custom Phone Case",
         image: "/phone_case.png"
     },
     // Add more entries here for Campaign #3, #4, etc.
 };
 
 const ProductCard = ({ campaign }) => {
-    const metadata = CAMPAIGN_METADATA[campaign.id] || { 
-        name: `[GB] Campaign #${campaign.id}`, 
+    const metadata = CAMPAIGN_METADATA[campaign.id] || {
+        name: `[GB] Campaign #${campaign.id}`,
         image: "/placeholder.png"
     };
 
@@ -39,7 +39,7 @@ const ProductCard = ({ campaign }) => {
     } else if (campaign.userHasJoined) {
         displayStatus = 'Committed';
     }
-    
+
     const progressPercent = campaign.goal > 0 ? (campaign.committed / campaign.goal) * 100 : 0;
 
     return (
@@ -67,19 +67,19 @@ export default function GroupBuyLanding(props) {
     const [error, setError] = useState("");
 
     const fetchCampaigns = useCallback(async () => {
-        if (!window.ethereum) { 
+        if (!window.ethereum) {
             console.log("MetaMask not installed, cannot fetch campaigns.");
             setIsLoading(false);
-            return; 
+            return;
         }
-        
+
         setIsLoading(true);
         setError("");
 
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const userAddress = accounts[0];
-            
+
             const web3Instance = new Web3(window.ethereum);
             const contract = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
@@ -93,7 +93,7 @@ export default function GroupBuyLanding(props) {
             const activeCampaignsData = results
                 .map((c, index) => ({ ...c, id: index }))
                 .filter(c => c.organizer !== '0x0000000000000000000000000000000000000000');
-            
+
             if (activeCampaignsData.length > 0) {
                 const detailedCampaignPromises = activeCampaignsData.map(async (campaign) => {
                     try {
@@ -138,47 +138,59 @@ export default function GroupBuyLanding(props) {
     // --- FUNCTION WITH THE FIX ---
     const handleCreateNewCampaign = async () => {
         if (!window.ethereum) { alert("Please install MetaMask."); return; }
-        
-        // We still check props.isConnected as a general guard.
-        if (!props.isConnected) { 
-            setError("Please connect your wallet to create a campaign."); 
-            return; 
+
+        if (!props.isConnected) {
+            setError("Please connect your wallet to create a campaign.");
+            return;
         }
 
-        const durationInput = window.prompt("Enter the duration for the new campaign (in days):", "30");
+        // --- THIS IS THE MODIFIED SECTION ---
+        const durationInput = window.prompt("Enter campaign duration (in days)");
         if (durationInput === null) {
             console.log("Campaign creation cancelled by user.");
             return;
         }
 
-        const durationInDays = parseInt(durationInput, 10);
-        if (isNaN(durationInDays) || durationInDays <= 0) {
-            alert("Invalid duration. Please enter a positive number for the days.");
-            setError("Invalid duration. Please enter a positive number for the days.");
+        // Use parseFloat to allow for decimals
+
+        let durationInDays = parseFloat(durationInput);
+        if (isNaN(durationInDays) || durationInDays < 0) {
+            alert("Invalid duration. Please enter a positive number or 0.");
+            setError("Invalid duration. Please enter a positive number or 0.");
             return;
         }
-        
+
+        // If the user enters 0 for testing, we change it to a tiny non-zero value.
+        // 0.0001 days is about 9 seconds. This will pass the contract's "> 0" check.
+        // if (durationInDays === 0) {
+        //     durationInDays = 0.0001;
+        // }
+        // --- END OF MODIFIED SECTION ---
+
         setIsCreating(true);
         setError("");
 
         try {
-            // FIX: We get the userAddress directly here, instead of relying on props.address.
-            // This avoids any timing issues.
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const userAddress = accounts[0];
 
-            // Add a check to ensure we actually got an address back.
             if (!userAddress) {
                 throw new Error("Could not retrieve wallet address. Please unlock MetaMask and try again.");
             }
-            
+
             const web3Instance = new Web3(window.ethereum);
             const contract = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-            
-            const nextCampaignIdToCreate = campaigns.length; 
+
+            const nextCampaignIdToCreate = campaigns.length;
             const CAMPAIGN_PRICE_ETH = "0.001";
             const CAMPAIGN_GOAL = 10;
-            const CAMPAIGN_DURATION_DAYS = durationInDays; 
+            // The variable now holds our potentially tiny decimal value
+            let CAMPAIGN_DURATION_SECONDS;
+            if (durationInDays === 0) {
+                CAMPAIGN_DURATION_SECONDS = 30;
+            } else {
+                CAMPAIGN_DURATION_SECONDS = durationInDays * 86400;
+            }
             const COMPANY_ADDRESS = userAddress;
 
             const priceInWei = ethers.utils.parseEther(CAMPAIGN_PRICE_ETH);
@@ -188,10 +200,14 @@ export default function GroupBuyLanding(props) {
                 COMPANY_ADDRESS,
                 priceInWei.toString(),
                 CAMPAIGN_GOAL,
-                CAMPAIGN_DURATION_DAYS
+                CAMPAIGN_DURATION_SECONDS // Send the correct value to the contract
             ).send({ from: userAddress, value: priceInWei.toString() });
 
-            await fetchCampaigns();
+            // Add a small delay to give the blockchain a moment to sync before re-fetching
+            setTimeout(() => {
+                fetchCampaigns();
+            }, 1000);
+
         } catch (err) {
             console.error("Failed to create new campaign:", err);
             setError(`Failed to create new campaign: ${err.message}`);
@@ -205,8 +221,8 @@ export default function GroupBuyLanding(props) {
             <div className="landing-header-container">
                 <h1>Active Group Buys</h1>
                 <div className="create-campaign-section">
-                    <button 
-                        className="commit-button" 
+                    <button
+                        className="commit-button"
                         onClick={handleCreateNewCampaign}
                         disabled={isCreating || !props.isConnected}
                     >
