@@ -183,7 +183,7 @@ export default function GroupBuyLanding(props) {
 
             const nextCampaignIdToCreate = campaigns.length;
             const CAMPAIGN_PRICE_ETH = "0.001";
-            const CAMPAIGN_GOAL = 10;
+            const CAMPAIGN_GOAL = 2;
             // The variable now holds our potentially tiny decimal value
             let CAMPAIGN_DURATION_SECONDS;
             if (durationInDays === 0) {
