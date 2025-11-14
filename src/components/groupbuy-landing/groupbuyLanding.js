@@ -237,7 +237,7 @@ export default function GroupBuyLanding(props) {
                 campaigns.length > 0 ? (
                     <div className="product-grid-landing">
                         {campaigns.map(c => (
-                            <Link key={c.id} to={`/InterfaceDemo/groupbuy/${c.id}`}>
+                            <Link key={c.id} to={`/InterfaceDemo/groupbuy-product/${c.id}`}>
                                 <ProductCard campaign={c} />
                             </Link>
                         ))}
