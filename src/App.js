@@ -10,7 +10,6 @@ import GroupBuyLanding from "./components/groupbuy-landing/groupbuyLanding";
 import Login from "./components/login/login";
 import Profile from "./components/profile/profile";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./contracts/config";
-import { CONTRACT_ABI_2, CONTRACT_ADDRESS_2 } from "./contracts/config_2";
 
 
 export default function App() {
@@ -21,7 +20,6 @@ export default function App() {
     const [balance, setBalance] = useState(0);
     const [isConnected, setIsConnected] = useState(false);
     const [contract, setContract] = useState(null);
-    const [contract2, setContract2] = useState(null);
     const navigate = useNavigate();
 
     // --- NEW (NECESSARY): State for all Group Buy components ---
@@ -47,8 +45,6 @@ export default function App() {
             const web3Instance = new Web3(window.ethereum);
             const contractInstance = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
             setContract(contractInstance);
-            const contract2Instance = new web3Instance.eth.Contract(CONTRACT_ABI_2, CONTRACT_ADDRESS_2);
-            setContract2(contract2Instance);
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             const chainId = await ethereum.request({ method: 'eth_chainId' });
             let balanceVal = await web3Provider.getBalance(accounts[0]);
@@ -66,9 +62,6 @@ export default function App() {
             setIsConnected(false);
         }
     }
-    // ... (All your other original functions remain here, unabridged)
-    useEffect(() => { /*...*/ }, [contract2]);
-
 
     // --- NEW (NECESSARY): Functions for Group Buy, wrapped in useCallback to prevent flickering ---
     const fetchCampaigns = useCallback(async () => {
