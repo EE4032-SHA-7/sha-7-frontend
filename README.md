@@ -3,7 +3,7 @@
 Welcome to the repository for the EE4032 SHA-7 Group Buy project! Credits to [the template repository](https://github.com/marcotom/EE4032)
 for the building block of the code that allowed us to put together the project. Our deployed project can be found [here](https://ee4032-sha-7.github.io/sha-7-frontend/). 
 
-![screenshot.jpg](public/screenshot.jpg)
+![screenshot.png](public/screenshot.png)
 
 ## Available Scripts
 
