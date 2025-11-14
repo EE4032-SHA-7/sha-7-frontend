@@ -13,6 +13,7 @@ const CAMPAIGN_METADATA = {
     0: { name: "Mechanical Keyboard", image: "/keyboard.png" },
     1: { name: "Hydro Flask Water Bottle", image: "/water_bottle.png" },
     2: { name: "Custom Phone Case", image: "/phone_case.png" },
+    3: { name: "Hand-held Fan", image: "/fan.png" },
 };
 
 export default function GroupBuy() {
