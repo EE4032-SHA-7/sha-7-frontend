@@ -5,14 +5,10 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 
 import './App.css';
+import GroupBuy from "./components/groupbuy-product/GroupBuy";
 import GroupBuyLanding from "./components/groupbuy-landing/groupbuyLanding";
-import GroupBuy from "./components/groupbuy/GroupBuy";
-import History from "./components/history/history";
-import Leader from "./components/leader/leader";
 import Login from "./components/login/login";
-import ProducerDashboard from './components/producerDashboard/producerDashboard';
 import Profile from "./components/profile/profile";
-import Storage from "./components/storage/storage";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "./contracts/config";
 import { CONTRACT_ABI_2, CONTRACT_ADDRESS_2 } from "./contracts/config_2";
 
@@ -26,20 +22,6 @@ export default function App() {
     const [isConnected, setIsConnected] = useState(false);
     const [contract, setContract] = useState(null);
     const [contract2, setContract2] = useState(null);
-    const storedPending = false;
-    const storedDone = false;
-    const showVal = 0;
-    const historyRecord = [];
-    const recordLen = 0;
-    const commitPending = false;
-    const commitDone = false;
-    const revealPending = false;
-    const revealAccepted = false;
-    const resetDone = false;
-    const showLead = "0x0000000000000000000000000000000000000000";
-    const electionOn = false;
-    const revealOn = false;
-    const elected = false;
     const navigate = useNavigate();
 
     // --- NEW (NECESSARY): State for all Group Buy components ---
@@ -85,13 +67,7 @@ export default function App() {
         }
     }
     // ... (All your other original functions remain here, unabridged)
-    const commitValUpdate = async () => { /*...*/ };
-    const revealVal = async () => { /*...*/ };
-    const resetHandle = async () => { /*...*/ };
     useEffect(() => { /*...*/ }, [contract2]);
-    const storedValUpdate = async () => { /*...*/ };
-    const showValUpdate = async () => { /*...*/ };
-    const showLeaderUpdate = async () => { /*...*/ };
 
 
     // --- NEW (NECESSARY): Functions for Group Buy, wrapped in useCallback to prevent flickering ---
@@ -181,10 +157,7 @@ export default function App() {
 
     // --- Display Functions (UNTOUCHED, except for new additions) ---
     const ProfileDisplay = () => ( <Profile isConnected={isConnected} address={address} networkType={network} balance={balance} /> );
-    const StorageDisplay = () => ( <Storage isConnected={isConnected} storeValHandle={storedValUpdate} showValHandle={showValUpdate} showVal={showVal} storedPending={storedPending} storedDone={storedDone} /> );
-    const HistoryDisplay = () => ( <History isConnected={isConnected} recordList={historyRecord} recordLen={recordLen} /> );
-    const LeaderDisplay = () => ( <Leader isConnected={isConnected} commitValHandle={commitValUpdate} showLeader={showLead} commitDone={commitDone} commitPending={commitPending} revealVal={revealVal} revealPending={revealPending} revealAccepted={revealAccepted} showLeaderHandle={showLeaderUpdate} resetHandle={resetHandle} resetDone={resetDone} electionOn={electionOn} revealOn={revealOn} elected={elected} /> );
-    
+
     const GroupBuyLandingDisplay = () => (
         <GroupBuyLanding
             isConnected={isConnected}
@@ -217,14 +190,8 @@ export default function App() {
                 {/* --- YOUR ROUTING REMAINS UNCHANGED --- */}
                 <Route path="/sha-7-frontend" element={<Login isHaveMetamask={haveMetamask} connectTo={connectWallet} />}></Route>
                 <Route path="/InterfaceDemo/profile" element={<ProfileDisplay />}></Route>
-                <Route path="/InterfaceDemo/storage" element={<StorageDisplay />}></Route>
-                <Route path="/InterfaceDemo/history" element={<HistoryDisplay />}></Route>
-                <Route path="/InterfaceDemo/leader" element={<LeaderDisplay />}></Route>
-                
                 <Route path="/InterfaceDemo/groupbuy-landing" element={<GroupBuyLandingDisplay />}></Route>
-                <Route path="/InterfaceDemo/groupbuy/:id" element={<GroupBuyDisplay />}></Route>
-
-                <Route path="/InterfaceDemo/producer-dashboard" element={<ProducerDashboard />}></Route>
+                <Route path="/InterfaceDemo/groupbuy-product/:id" element={<GroupBuyDisplay />}></Route>
                 <Route path="*" element={<Login isHaveMetamask={haveMetamask} connectTo={connectWallet} />} />
             </Routes>
         </div>
