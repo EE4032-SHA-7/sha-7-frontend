@@ -22,6 +22,10 @@ const CAMPAIGN_METADATA = {
         name: "Custom Phone Case",
         image: "/phone_case.png"
     },
+    3: {
+        name: "Hand-held Fan",
+        image: "/fan.png"
+    }
     // Add more entries here for Campaign #3, #4, etc.
 };
 
